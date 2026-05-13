@@ -25,5 +25,5 @@ Route::post('/login', [AuthController::class, 'login']);
 // لتسجيل الخروج
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/', function () {
-    return view('welcome');
+    return view('/login');
 });
