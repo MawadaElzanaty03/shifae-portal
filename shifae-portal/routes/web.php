@@ -19,9 +19,17 @@ Route::get('/login', function () {
     return view('login');
 })->name('login');
 
+
+
+
+
 // لاستقبال البيانات من الفورم والتحقق منها
 Route::post('/login', [AuthController::class, 'login']);
 
 // لتسجيل الخروج
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
 Route::get('/', [DoctorController::class, 'index'])->name('home');
+
+});
+main
