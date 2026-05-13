@@ -7,60 +7,59 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Exception;
 
-// Class name starts with an uppercase letter
 class AuthController extends Controller
 {
     /**
-     * Handle an authentication attempt.
      * دالة تسجيل الدخول
      */
     public function login(Request $request)
     {
-        // Try/catch block MUST exist for all methods to handle unexpected errors
+        // استخدام try و catch إجباري عشان لو صار خطأ النظام ما يوقفش
         try {
-            // Validate the incoming request data
-            $request->validate([// التأكد من أن المستخدم قام بإدخال اسم المستخدم وكلمة المرور
+            // التأكد من أن المستخدم قام بإدخال اسم المستخدم وكلمة المرور
+            $request->validate([
                 'userName' => 'required|string',
                 'password' => 'required|string',
             ]);
 
-            // Extract credentials into a descriptive camelCase variable
-            $userCredentials = [//تجميع بيانات الدخول
+            // تجميع بيانات الدخول في متغير
+            $userLoginData = [
                 'userName' => $request->userName,
                 'password' => $request->password
             ];
-// محاولة تسجيل الدخول باستخدام البيانات اللي دخلها المستخدم
-            // Attempt to authenticate the user using the provided credentials
-            if (Auth::attempt($userCredentials)) {
-                
-                // Authentication passed, retrieve the authenticated user object
-                $loggedInUser = Auth::user();
 
-                // Regenerate session to prevent session fixation attacks
+            // محاولة تسجيل الدخول باستخدام البيانات اللي دخلها المستخدم
+            if (Auth::attempt($userLoginData)) {
+                
+                // لو البيانات صحيحة، نجيب بيانات المستخدم اللي سجل دخوله
+                $authenticatedUser = Auth::user();
+
+                // تجديد الجلسة (Session) كخطوة حماية للنظام
                 $request->session()->regenerate();
 
-                // Check user role to redirect them to the correct dashboard (Doctor or Admin)
-                if ($loggedInUser->role === 'doctor') {
+                // التحقق من نوع المستخدم (طبيب أو مدير) لتوجيهه للصفحة المناسبة
+                if ($authenticatedUser->role === 'doctor') {
                     return redirect()->intended('/doctor-dashboard');
                 } else {
                     return redirect()->intended('/admin-dashboard');
                 }
             }
 
-            // If authentication fails, return back with an error message
+            // لو كلمة المرور أو اسم المستخدم خطأ، نرجعه لصفحة الدخول مع رسالة
             return back()->withErrors([
                 'userName' => 'بيانات الدخول غير صحيحة، يرجى المحاولة مرة أخرى.',
             ])->onlyInput('userName');
 
-        } catch (Exception $systemException) {
-            // Catch any unexpected system errors during login
+        } catch (Exception $loginError) {
+            // التقاط أي خطأ غير متوقع في النظام وإظهاره للمستخدم
             return back()->withErrors([
-                'systemError' => 'حدث خطأ في النظام أثناء محاولة تسجيل الدخول: ' . $systemException->getMessage(),
+                'systemError' => 'حدث خطأ في النظام أثناء محاولة تسجيل الدخول: ' . $loginError->getMessage(),
             ]);
         }
     }
+
     /**
-     * Log the user out of the application.
+     * دالة تسجيل الخروج
      */
     public function logout(Request $request)
     {

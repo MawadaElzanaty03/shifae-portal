@@ -13,17 +13,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\DoctorController;
 // لعرض صفحة تسجيل الدخول
 Route::get('/login', function () {
     return view('login');
 })->name('login');
+
+
+
+
 
 // لاستقبال البيانات من الفورم والتحقق منها
 Route::post('/login', [AuthController::class, 'login']);
 
 // لتسجيل الخروج
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('/', function () {
-    return view('/login');
+
+Route::get('/', [DoctorController::class, 'index'])->name('home');
+
 });
+main
