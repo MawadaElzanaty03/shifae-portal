@@ -31,5 +31,5 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/', [DoctorController::class, 'index'])->name('home');
 
-});
+
 main
