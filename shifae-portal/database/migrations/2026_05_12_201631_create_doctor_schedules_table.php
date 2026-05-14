@@ -17,7 +17,9 @@ return new class extends Migration
       $table->foreignId('doctorId')->constrained('users')->onDelete('cascade');
 
         // الخصائص حسب الكلاس دايجرام
-        $table->string('day');           // اليوم (Sunday, Monday, etc.)
+     $table->enum('day', [
+            'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'
+        ]);//لان ايام الاسبوع قيم تابثة 
         $table->time('startTime');      // وقت البداية
         $table->time('endTime');        // وقت النهاية
         

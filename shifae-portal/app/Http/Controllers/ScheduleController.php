@@ -19,9 +19,18 @@ class ScheduleController extends Controller
     {
         // 1. التحقق من صحة البيانات المدخلة
         $request->validate([
-            'day' => 'required|string',
+            'days' => 'required|array|min:1',
+            'days.*' => [
+            'required',
+            'string',
+            Rule::in(['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'])
+        ],
             'startTime' => 'required|date_format:H:i',
             'endTime' => 'required|date_format:H:i|after:startTime',
+        ],
+        [
+            'days.required' => 'الرجاء اختيار يوم واحد على الأقل.',
+        'days.*.in' => 'قيمة اليوم غير صالحة.',
         ]);
 
         // 2. الحصول على حساب الطبيب المرتبط بالمستخدم الحالي
