@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('doctors', function (Blueprint $table) {
-        $table->id(); // هذا حيكون الـ doctor_id اللي بنربطوا بيه بعدين
+        $table->id('doctorId'); // هذا حيكون الـ doctor_id اللي بنربطوا بيه بعدين
         
         // الربط بجدول المستخدمين (هذي هي الوراثة اللي في الرسمة)
-        $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+        $table->foreignId('userId')->constrained('users')->onDelete('cascade');
         
         // الخصائص الخاصة بالدكتور من الكلاس دايجرام
         $table->string('specialty'); // التخصص

@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('records', function (Blueprint $table) {
-            $table->id();// recordId
+            $table->id('recordId');// recordId
         // - foreignId('patient_id'): يصنع خانة للرقم التعريفي للمريض.
         // - constrained('patients'): يتأكد إن الرقم هذا موجود فعلاً في جدول المرضى.
         // - onDelete('cascade'): لو مسحنا ملف المريض من المنظومة، تنمسح معاه كل سجلاته تلقائياً باش ما تقعدش بيانات عشوائية.
-        $table->foreignId('patient_id')->constrained('patients')->onDelete('cascade');
+        $table->foreignId('patientId')->constrained('patients')->onDelete('cascade');
        // هذا السطر يربط السجل الطبي بالدكتور المعالج .
        // لو تم حذف الدكتور من المنظومة، تنحذف السجلات المرتبطة بيه (ممكن تغييرها لاحقاً لو تبي تحتفظي بالسجلات).
-        $table->foreignId('doctor_id')->constrained('doctors')->onDelete('cascade');
+        $table->foreignId('doctorId')->constrained('doctors')->onDelete('cascade');
         
         // خصائص السجل
         $table->string('diagnosis');//خانة لتشخيص المبدئي
