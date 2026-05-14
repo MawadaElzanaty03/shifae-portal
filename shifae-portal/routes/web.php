@@ -29,8 +29,9 @@ Route::post('/login', [AuthController::class, 'login']);
 // لتسجيل الخروج
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/', [DoctorController::class, 'index'])->name('home');
+Route::get('/', function () {
+    // جلب الدكاترة من قاعدة البيانات مباشرة لإرسالهم للـ welcome
+    $doctorsList = \App\Models\Doctor::all(); 
+    return view('welcome',['doctorsList' => $doctorsList]);
+})->name('home');
 
-Route::get('/login', function () {
-    return view('login');
-})->name('login');
