@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('doctor_schedules', function (Blueprint $table) {//جدول الخاص بساعات عمل الدكاترة
-            $table->id();
+            $table->id('scheduleId');
         // ربط الجدول بجدول الأطباء (وليس المستخدمين العامين)
-        $table->foreignId('doctor_id')->constrained('doctors')->onDelete('cascade');
+      $table->foreignId('doctorId')->constrained('users')->onDelete('cascade');
 
         // الخصائص حسب الكلاس دايجرام
         $table->string('day');           // اليوم (Sunday, Monday, etc.)

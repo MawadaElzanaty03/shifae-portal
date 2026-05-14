@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('bookings', function (Blueprint $table) {
         $table->id();
             // ربط الحجز بمريض معين (علاقة Foreign Key)
-        $table->foreignId('patient_id')->constrained('patients')->onDelete('cascade');
-         $table->foreignId('doctor_id')->constrained('doctors')->onDelete('cascade');// لربط بالطبيب من يكون
+        $table->foreignId('patientId')->constrained('patients')->onDelete('cascade');
+         $table->foreignId('doctorId')->constrained('doctors')->onDelete('cascade');// لربط بالطبيب من يكون
          // بيانات الحجز الأساسية
         $table->dateTime('appointmentDate'); // تاريخ ووقت الموعد
         $table->string('roomNumber');        // رقم الحجرة
