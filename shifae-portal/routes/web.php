@@ -34,4 +34,11 @@ Route::get('/', function () {
     $doctorsList = \App\Models\Doctor::all(); 
     return view('welcome',['doctorsList' => $doctorsList]);
 })->name('home');
+Route::middleware(['auth'])->group(function () {
+    // عرض صفحة إضافة الموعد
+    Route::get('/doctor/add-schedule', [ScheduleController::class, 'create'])->name('doctor.schedule.create');
+    
+    // حفظ الموعد
+    Route::post('/doctor/store-schedule', [ScheduleController::class, 'store'])->name('doctor.schedule.store');
+});
 
