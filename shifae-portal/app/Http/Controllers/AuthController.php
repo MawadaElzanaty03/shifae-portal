@@ -38,8 +38,8 @@ class AuthController extends Controller
                 $request->session()->regenerate();
 
                 // التحقق من نوع المستخدم (طبيب أو مدير) لتوجيهه للصفحة المناسبة
-                if ($authenticatedUser->role === 'doctor') {
-                    return redirect()->intended('/doctor-dashboard');
+                if ($authenticatedUser->userRole === 'Doctor') {
+                    return redirect()->intended('/doctor/add-schedule');
                 } else {
                     return redirect()->intended('/admin-dashboard');
                 }

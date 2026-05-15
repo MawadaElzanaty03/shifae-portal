@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\DoctorSchedule;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Validation\Rule;
 
 
 class ScheduleController extends Controller
@@ -12,7 +12,7 @@ class ScheduleController extends Controller
   // دالة لعرض صفحة إضافة المواعيد
     public function create()
     {
-        return view('doctor.schedules.create');
+        return view('doctor_schedules_creat');
     }
     // دالة لاستقبال البيانات وحفظها في قاعدة البيانات
     public function store(Request $request)
@@ -37,13 +37,15 @@ class ScheduleController extends Controller
         $doctor = Auth::user()->doctor;
 
         // 3. تخزين الموعد في قاعدة البيانات
-        DoctorSchedule::create([
-            'doctorId' => $doctor->doctorId,
-            'day' => $request->day,
-            'startTime' => $request->startTime,
-            'endTime' => $request->endTime,
-            'isAvailable' => true,
-        ]);
+      foreach ($request->days as $selectedDay) {
+            DoctorSchedule::create([
+                'doctorId'    => $doctor->doctorId,
+                'day'         => $selectedDay, // لتخزين ايام عمل الطبيب
+                'startTime'   => $request->startTime,
+                'endTime'     => $request->endTime,
+                'isAvailable' => true,
+            ]);
+        }
 
         // 4. إرجاع الطبيب للصفحة مع رسالة نجاح
         return redirect()->back()->with('success', 'تمت إضافة الموعد بنجاح!');
