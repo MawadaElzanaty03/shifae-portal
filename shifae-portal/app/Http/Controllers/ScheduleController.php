@@ -25,8 +25,8 @@ class ScheduleController extends Controller
             'string',
             Rule::in(['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'])
         ],
-            'startTime' => 'required|date_format:H:i',
-            'endTime' => 'required|date_format:H:i|after:startTime',
+           'startTime' => 'required|date_format:H:i|after_or_equal:09:00|before:18:30',
+'endTime'   => 'required|date_format:H:i|after:startTime|before_or_equal:19:00',
         ],
         [
             'days.required' => 'الرجاء اختيار يوم واحد على الأقل.',
@@ -49,4 +49,49 @@ class ScheduleController extends Controller
 
         // 4. إرجاع الطبيب للصفحة مع رسالة نجاح
         return redirect()->back()->with('success', 'تمت إضافة الموعد بنجاح!');
-}}
+}
+//1. عرض مواعيد الدكتور الحالي
+public function showSchedule()
+{
+    $mySchedules = \App\Models\DoctorSchedule::where('doctorId', auth()->id())->get();
+    return view('doctor.doctor_schedule_index', compact('mySchedules'));
+}
+//دالة لحذ موعد
+public function deleteSchedule($id)
+{
+    $schedule = \App\Models\DoctorSchedule::where('scheduleId', $id)->where('doctorId', auth()->id())->firstOrFail();
+    $schedule->delete();
+    
+    return back()->with('success', 'تم حذف الموعد بنجاح.');
+}
+// 3. دالة التعديل (تحديث الوقت)
+public function updateSchedule(Request $request, $id)
+{
+    $rules=[
+        'startTime' => 'required|date_format:H:i|after_or_equal:09:00',
+        'endTime' => 'required|date_format:H:i|after:startTime|before_or_equal:19:00',
+    ];
+    $messages = [//عرض رسائل الخطاء بالعربية
+        'startTime.required'    => 'يجب تحديد وقت بداية الدوام.',
+        'startTime.date_format' => 'صيغة الوقت غير صحيحة، يرجى إدخال الوقت بشكل صحيح.',
+        'startTime.after_or_equal' => 'يجب أن يبدأ الدوام من الساعة 09:00 صباحاً أو بعدها.',
+        
+        'endTime.required'      => 'يجب تحديد وقت نهاية الدوام.',
+        'endTime.after'         => 'وقت النهاية يجب أن يكون بعد وقت البداية.',
+        'endTime.before_or_equal' => 'يجب أن ينتهي الدوام في تمام الساعة 19:00 (07:00 مساءً) أو قبلها.',
+    ];
+    // تنفيذ التحقق مع الرسائل الجديدة
+    $request->validate($rules, $messages);
+
+    
+    
+
+    $schedule = \App\Models\DoctorSchedule::where('scheduleId', $id)->where('doctorId', auth()->id())->firstOrFail();
+    $schedule->update([
+        'startTime' => $request->startTime,
+        'endTime' => $request->endTime,
+    ]);
+
+    return back()->with('success', 'تم تحديث الوقت بنجاح.');
+}
+}

@@ -41,12 +41,22 @@ Route::post('/login', [AuthController::class, 'login']);
 // لتسجيل الخروج
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-
+//الصفحة الرئيسية لواجهة الدكتور
 Route::middleware(['auth'])->group(function () {
+    Route::get('/doctor/dashboard', function () {
+        return view('doctor.dashboard');
+    })->name('doctor.dashboard');
     // عرض صفحة إضافة الموعد
     Route::get('/doctor/add-schedule', [ScheduleController::class, 'create'])->name('doctor.schedule.create');
-    
-    // حفظ الموعد
     Route::post('/doctor/store-schedule', [ScheduleController::class, 'addSchedule'])->name('doctor.schedule.add');
-});
+
+    //عرض المواعيد لغرض الحذف او التعديل
+    Route::get('/doctor/manage-schedules', [ScheduleController::class, 'showSchedule'])->name('doctor.schedules.index');
+    //تعديل موعد معين
+    Route::put('/doctor/schedule/update/{id}', [ScheduleController::class, 'updateSchedule'])->name('doctor.schedules.update');
+    // حذف موعد معين
+    Route::delete('/doctor/schedule/delete/{id}', [ScheduleController::class, 'deleteSchedule'])->name('doctor.schedules.delete');
+}
+
+);
 
