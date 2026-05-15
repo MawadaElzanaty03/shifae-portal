@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بوابة شفائي - إضافة أوقات الدوام</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
+   @extends('doctor.dashboard')//باش يستخدم القالب التابت لكل صفحات الدكتور
+
+@section('content')
+   <style>
         body { font-family: 'Tajawal', sans-serif; background-color: #eef2f5; padding: 40px 20px; margin: 0; }
         .form-container { background: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 5px solid #007bb5; }
         .page-title { text-align: center; color: #007bb5; margin-bottom: 25px; margin-top: 0; }
@@ -62,7 +65,7 @@
             </div>
         @endif
 
-        <form action="{{ route('doctor.schedule.store') }}" method="POST">
+        <form action="{{ route('doctor.schedule.add') }}" method="POST">
             @csrf <div class="form-group">
                 <label>اختر أيام العمل (يمكنك اختيار أكثر من يوم):</label>
                 <div class="checkbox-group">
@@ -78,12 +81,12 @@
 
             <div class="form-group">
                 <label for="startTime">من الساعة:</label>
-                <input type="time" name="startTime" id="startTime" required>
+                <input type="time" name="startTime" id="startTime" min="09:00" max="18:59" required>
             </div>
 
             <div class="form-group">
                 <label for="endTime">إلى الساعة:</label>
-                <input type="time" name="endTime" id="endTime" required>
+                <input type="time" name="endTime" id="endTime" min="07:01" max="19:00 " required >
             </div>
 
             <button type="submit" class="btn-submit">حفظ المواعيد</button>
@@ -91,4 +94,5 @@
     </div>
 
 </body>
+@endsection
 </html>

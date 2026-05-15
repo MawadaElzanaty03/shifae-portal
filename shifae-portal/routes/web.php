@@ -15,6 +15,17 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ScheduleController;
+
+
+
+Route::get('/', function () {
+    // نجلب كل الدكاترة مباشرة مع جداول مواعيدهم بدون شرط الـ role 
+    // لأننا أصلاً نبحث في جدول الدكاترة
+    $doctorsList = \App\Models\Doctor::with('schedules')->get(); 
+    
+    return view('welcome', ['doctorsList' => $doctorsList]);
+})->name('home');
+
 // لعرض صفحة تسجيل الدخول
 Route::get('/login', function () {
     return view('login');
@@ -30,16 +41,22 @@ Route::post('/login', [AuthController::class, 'login']);
 // لتسجيل الخروج
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/', function () {
-    // جلب الدكاترة من قاعدة البيانات مباشرة لإرسالهم للـ welcome
-    $doctorsList = \App\Models\Doctor::all(); 
-    return view('welcome',['doctorsList' => $doctorsList]);
-})->name('home');
+//الصفحة الرئيسية لواجهة الدكتور
 Route::middleware(['auth'])->group(function () {
+    Route::get('/doctor/dashboard', function () {
+        return view('doctor.dashboard');
+    })->name('doctor.dashboard');
     // عرض صفحة إضافة الموعد
     Route::get('/doctor/add-schedule', [ScheduleController::class, 'create'])->name('doctor.schedule.create');
-    
-    // حفظ الموعد
-    Route::post('/doctor/store-schedule', [ScheduleController::class, 'store'])->name('doctor.schedule.store');
-});
+    Route::post('/doctor/store-schedule', [ScheduleController::class, 'addSchedule'])->name('doctor.schedule.add');
+
+    //عرض المواعيد لغرض الحذف او التعديل
+    Route::get('/doctor/manage-schedules', [ScheduleController::class, 'showSchedule'])->name('doctor.schedules.index');
+    //تعديل موعد معين
+    Route::put('/doctor/schedule/update/{id}', [ScheduleController::class, 'updateSchedule'])->name('doctor.schedules.update');
+    // حذف موعد معين
+    Route::delete('/doctor/schedule/delete/{id}', [ScheduleController::class, 'deleteSchedule'])->name('doctor.schedules.delete');
+}
+
+);
 

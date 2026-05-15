@@ -15,4 +15,5 @@ class DoctorSchedule extends Model
         'endTime',      // وقت النهاية
         'isAvailable',  // حالة التوفر (متاح/غير متاح)
     ];
+protected $primaryKey = 'scheduleId';
 }
