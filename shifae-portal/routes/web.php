@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ScheduleController;
-
+use App\Http\Controllers\BookingController;
 
 
 Route::get('/', function () {
@@ -59,4 +59,6 @@ Route::middleware(['auth'])->group(function () {
 }
 
 );
+Route::post('/bookings/store', [BookingController::class, 'store'])->name('bookings.store');
+
 
