@@ -6,6 +6,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 class BookingController extends Controller
 {
+    public function create()//دالة لجلب الاطباء الذين لديهم مواعيد
+{
+    // جلب الأطباء الذين لديهم مواعيد متاحة حالياً
+    $doctors = Doctor::with(['user', 'schedules' => function($query) {
+        $query->where('isAvailable', true);
+    }])->get();
+
+    return view('bookings.booking-form', compact('doctors'));
+}
 public function store(Request $request)
 {
     // جلب بيانات الجدول الزمني باستخدام المفتاح scheduleId
