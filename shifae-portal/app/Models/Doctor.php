@@ -10,8 +10,8 @@ class Doctor extends Model
     protected $primaryKey = 'doctorId';
     protected $fillable = [
         'userId',            // ضروري يكون هنا باش تربطيه باليوزر اللي انشأتيه
-        'specialty',         // التخصص (من الـ Class Diagram)
-        'profitPercentage',  // نسبة الأرباح (من الـ Class Diagram)
+        'specialty',         // التخصص 
+        'profitPercentage',  // نسبة الأرباح 
     ];
     public function schedules()
 {

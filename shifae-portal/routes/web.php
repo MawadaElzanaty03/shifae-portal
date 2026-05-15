@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\ScheduleController;
 // لعرض صفحة تسجيل الدخول
 Route::get('/login', function () {
     return view('login');
