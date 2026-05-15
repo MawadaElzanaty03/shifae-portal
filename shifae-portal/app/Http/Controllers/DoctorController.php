@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 
 
 
@@ -18,13 +16,13 @@ class DoctorController extends Controller
     /**
      * دالة لعرض جدول الأطباء في الواجهة الرئيسية
      */
-    public function index()
+    public function viewSchedule()
     {
        
         try {
             // جلب قائمة الأطباء مع جداول المواعيد الخاصة بهم
             
-            $doctorsList = User::where('role', 'doctor')
+            $doctorsList = User::where('userRole', 'doctor')
                                 ->with('schedules') // جلب الجداول المرتبطة بكل دكتور
                                 ->get();
 

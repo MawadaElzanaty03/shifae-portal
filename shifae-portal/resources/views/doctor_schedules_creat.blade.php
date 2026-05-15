@@ -62,7 +62,7 @@
             </div>
         @endif
 
-        <form action="{{ route('doctor.schedule.store') }}" method="POST">
+        <form action="{{ route('doctor.schedule.add') }}" method="POST">
             @csrf <div class="form-group">
                 <label>اختر أيام العمل (يمكنك اختيار أكثر من يوم):</label>
                 <div class="checkbox-group">

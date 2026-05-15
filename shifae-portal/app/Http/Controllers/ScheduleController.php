@@ -15,7 +15,7 @@ class ScheduleController extends Controller
         return view('doctor_schedules_creat');
     }
     // دالة لاستقبال البيانات وحفظها في قاعدة البيانات
-    public function store(Request $request)
+    public function addSchedule(Request $request)
     {
         // 1. التحقق من صحة البيانات المدخلة
         $request->validate([
