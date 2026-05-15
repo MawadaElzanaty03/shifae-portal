@@ -16,4 +16,13 @@ class DoctorSchedule extends Model
         'isAvailable',  // حالة التوفر (متاح/غير متاح)
     ];
 protected $primaryKey = 'scheduleId';
+
+private function checkAvailability($scheduleId)
+{
+    // البحث عن الموعد في جدول المواعيد المتاحة للأطباء
+    $schedule = \App\Models\DoctorSchedule::find($scheduleId);
+
+    // إذا كان الموعد موجوداً وحالته "متاح" (true) يرجع true
+    return $schedule && $schedule->isAvailable;
+}
 }
