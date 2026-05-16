@@ -58,7 +58,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/doctor/schedule/delete/{id}', [ScheduleController::class, 'deleteSchedule'])->name('doctor.schedules.delete');
 }
 
-);Route::get('/bookings/form', [BookingController::class, 'create'])->name('bookings.form');
+);
+Route::get('/bookings/form', [BookingController::class, 'create'])->name('bookings.form');
 
 Route::post('/bookings/store', [BookingController::class, 'store'])->name('bookings.store');
 

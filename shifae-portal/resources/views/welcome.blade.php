@@ -82,7 +82,7 @@
 
                     <!-- هنا الأزرار في مكان منفصل -->
                     <div class="doctor-actions"><a href="{{ route('bookings.form') }}" class="btn-main btn-booking">حجز موعد جديد</a>
-                      <a href="{{ route('bookings.create') }}" class="btn-main btn-booking">حجز موعد جديد</a>
+                     
                         <a href="#" class="btn-main btn-manage">تعديل أو حذف حجز سابق</a>
                     </div>
                 @else
