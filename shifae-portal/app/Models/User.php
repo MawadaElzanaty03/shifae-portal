@@ -17,6 +17,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    protected $primaryKey = 'userId';
     protected $fillable = [
         'userName',    
         'fullName',
@@ -39,5 +40,9 @@ class User extends Authenticatable
      *
      * @var array<string, string>
      */
+    public function doctor()
+{
+    return $this->hasOne(Doctor::class, 'userId');
+}
     
 }
