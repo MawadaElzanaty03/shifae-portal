@@ -81,9 +81,9 @@
                     </table>
 
                     <!-- هنا الأزرار في مكان منفصل -->
-                    <div class="doctor-actions">
-                        <a href="#" class="btn-main btn-booking">حجز موعد جديد</a>
-                        <a href="#" class="btn-main btn-manage">تعديل أو حذف حجز سابق</a>
+                    <div class="doctor-actions"><a href="{{ route('bookings.form') }}" class="btn-main btn-booking">حجز موعد جديد</a>
+                   
+  
                     </div>
                 @else
                     <p class="no-data">لا توجد مواعيد متاحة حالياً.</p>

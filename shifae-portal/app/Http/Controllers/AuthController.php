@@ -13,16 +13,12 @@ class AuthController extends Controller
      * دالة تسجيل الدخول
      */
     public function login(Request $request)
-    {
-        // استخدام try و catch إجباري عشان لو صار خطأ النظام ما يوقفش
-        try {
-            // التأكد من أن المستخدم قام بإدخال اسم المستخدم وكلمة المرور
+    { // استخدام try و catch إجباري عشان لو صار خطأ النظام ما يوقفش
+        try {  // التأكد من أن المستخدم قام بإدخال اسم المستخدم وكلمة المرور
             $request->validate([
                 'userName' => 'required|string',
                 'password' => 'required|string',
-            ]);
-
-            // تجميع بيانات الدخول في متغير
+            ]); // تجميع بيانات الدخول في متغير
             $userLoginData = [
                 'userName' => $request->userName,
                 'password' => $request->password
@@ -44,12 +40,10 @@ class AuthController extends Controller
                     return redirect()->intended('/admin-dashboard');
                 }
             }
-
             // لو كلمة المرور أو اسم المستخدم خطأ، نرجعه لصفحة الدخول مع رسالة
             return back()->withErrors([
                 'userName' => 'بيانات الدخول غير صحيحة، يرجى المحاولة مرة أخرى.',
             ])->onlyInput('userName');
-
         } catch (Exception $loginError) {
             // التقاط أي خطأ غير متوقع في النظام وإظهاره للمستخدم
             return back()->withErrors([
