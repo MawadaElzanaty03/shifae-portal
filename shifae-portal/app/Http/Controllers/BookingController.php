@@ -135,14 +135,107 @@ public function store(Request $request)
             'doctorId' => $doctorId,
             'appointmentDate' => $fullAppointmentDate,
             'roomNumber' => $request->roomNumber ?? '101',
-            'status' => 'confirmed',
+            'status' => 'pending',
         ]);
          $bookingNumber = $booking->id;
         // 5. في حال نجاح كل شيء
         return redirect()->back()->with('success', "تم الحجز بنجاح وإضافة الموعد للمنظومة! (#{$bookingNumber})");
 
-    } catch (\Exception $e) {
+    } 
+    
+    
+    
+    catch (\Exception $e) {
         // 🛑 هذا السطر هو اللي حيصيد الخطأ لو الداتابيز رفضت الحفظ
         dd('فشل الحفظ في الداتابيز بسبب الخطأ التالي: ' . $e->getMessage());
     }
-}}
+
+
+}
+
+
+//بنبعتهم من اسراء 
+public function update(Request $request, $id)// دالة تعديل حجز لمريض
+    {
+        try {
+            // 1. التحقق من البيانات اللي تبي تسمح بتعديلها فقط
+            $validated = $request->validate([
+                'roomNumber'  => 'sometimes|string',
+                // لو تبي تسمح بتعديل الاسم ورقم الهاتف ضيفهم هنا:
+                // 'name'        => 'sometimes|string|max:255',
+                // 'phoneNumber' => 'sometimes|string',
+            ]);
+
+            // 2. جلب الحجز مباشرة (من غير أي شروط للصلاحيات)
+            $booking = Booking::findOrFail($id);
+
+            // 3. تطبيق التعديلات
+            $booking->update($validated);
+
+            return redirect()->back()->with('success', 'تم تعديل بيانات الحجز بنجاح.');
+
+        } catch (\Exception $e) {
+            \Log::error('حدث خطأ أثناء التعديل: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'عذراً، حدث خطأ أثناء التعديل.');
+        }
+    }
+
+    public function destroy($id)
+{
+    try {
+        // 1. جلب الحجز باستخدام الـ ID أو إرجاع خطأ 404 إذا لم يُعثر عليه
+        $booking = Booking::findOrFail($id);
+
+        // 2. تحديث حالة الحجز إلى "ملغي" بدلاً من الحذف الفعلي
+      
+        $booking->update([
+            'status' => 'cancelled'
+        ]);
+
+        // 3. إعادة توجيه المريض إلى صفحة إنشاء الحجوزات مع رسالة نجاح
+        return redirect()->route('bookings.create')->with('success', 'تم إلغاء الموعد بنجاح.');
+
+    } catch (\Exception $e) {
+        // تسجيل الخطأ في ملف النظام إذا حدثت مشكلة غير متوقعة
+        \Log::error('حدث خطأ أثناء إلغاء الحجز رقم ' . $id . ': ' . $e->getMessage());
+        
+        return redirect()->back()->with('error', 'عذراً، حدث خطأ أثناء محاولة إلغاء الموعد.');
+    }
+}
+ // دالة لعرض واجهة البحث
+    public function search()
+    {
+        return view('bookings.search');
+    }
+
+    // دالة لاستقبال رقم الحجز والبحث عنه
+    public function findBooking(Request $request)
+    {
+        try {
+            // التحقق من أن المريض أدخل رقم الحجز
+            $request->validate([
+                'booking_id' => 'required|numeric'
+            ]);
+
+            // البحث عن الحجز برقم الـ ID
+            $booking = Booking::find($request->booking_id);
+
+            // إذا لم يتم العثور على الحجز
+            if (!$booking) {
+                return redirect()->back()->with('error', 'عذراً، لم نتمكن من العثور على حجز بهذا الرقم. يرجى التأكد من الرقم والمحاولة مرة أخرى.');
+            }
+
+            // إذا كان الحجز ملغياً مسبقاً (اختياري: لتنبيه المريض)
+            if ($booking->status == 'cancelled') {
+                return redirect()->back()->with('error', 'هذا الحجز ملغي مسبقاً.');
+            }
+
+            // إذا تم العثور عليه، نقوم بتحويله لصفحة التعديل (التي برمجناها سابقاً)
+            return redirect()->route('bookings.edit', $booking->id);
+
+        } catch (\Exception $e) {
+            \Log::error('حدث خطأ أثناء البحث عن الحجز: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'حدث خطأ غير متوقع أثناء البحث.');
+        }
+    }
+}
