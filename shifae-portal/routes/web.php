@@ -12,7 +12,18 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+use App\Http\Controllers\AuthController;
 
+// لعرض صفحة تسجيل الدخول
+Route::get('/login', function () {
+    return view('login');
+})->name('login');
+
+// لاستقبال البيانات من الفورم والتحقق منها
+Route::post('/login', [AuthController::class, 'login']);
+
+// لتسجيل الخروج
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/', function () {
-    return view('welcome');
+    return view('/login');
 });
