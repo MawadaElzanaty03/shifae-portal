@@ -59,6 +59,8 @@ Route::middleware(['auth'])->group(function () {
 }
 
 );
+Route::get('/bookings/form', [BookingController::class, 'create'])->name('bookings.form');
+
 Route::post('/bookings/store', [BookingController::class, 'store'])->name('bookings.store');
 
 
