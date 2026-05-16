@@ -15,6 +15,7 @@ class BookingController extends Controller
     // 1. تحديد التاريخ المختار (تاريخ اليوم كافتراضي)
     // $selectedDate = $request->get('date', date('Y-m-d'));
     
+  try{
     // 2. مصفوفة لترجمة الأيام من الإنجليزية للعربية لتطابق قاعدة بياناتك
     $daysMapping = [
         'Sunday'    => 'الأحد',
@@ -90,6 +91,16 @@ class BookingController extends Controller
 
     return view('bookings.booking-form', compact('availableSlots'));
 }
+  catch (\Exception $e) {
+        // تسجيل الخطأ في ملفات النظام (storage/logs/laravel.log) لمعرفة سبب المشكلة
+        Log::error('حدث خطأ أثناء تحميل صفحة إنشاء الحجز: ' . $e->getMessage());
+
+        // في حالة حدوث خطأ، نرسل المستخدم لنفس الصفحة ولكن بمصفوفة مواعيد فارغة ورسالة خطأ
+        session()->flash('error', 'عذراً، حدث خطأ أثناء تحميل المواعيد المتاحة. يرجى المحاولة لاحقاً.');
+        
+        return view('bookings.booking-form', ['availableSlots' => []]);
+}
+}
 public function store(Request $request)
 {
     // 1. التحقق من البيانات
@@ -126,9 +137,9 @@ public function store(Request $request)
             'roomNumber' => $request->roomNumber ?? '101',
             'status' => 'confirmed',
         ]);
-
+         $bookingNumber = $booking->id;
         // 5. في حال نجاح كل شيء
-        return redirect()->back()->with('success', 'تم الحجز بنجاح وإضافة الموعد للمنظومة!');
+        return redirect()->back()->with('success', "تم الحجز بنجاح وإضافة الموعد للمنظومة! (#{$bookingNumber})");
 
     } catch (\Exception $e) {
         // 🛑 هذا السطر هو اللي حيصيد الخطأ لو الداتابيز رفضت الحفظ
