@@ -43,9 +43,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 //الصفحة الرئيسية لواجهة الدكتور
 Route::middleware(['auth'])->group(function () {
-    Route::get('/doctor/dashboard', function () {
-        return view('doctor.dashboard');
-    })->name('doctor.dashboard');
+    // توجيه المسار للـ Controller باش يجيب المواعيد قبل ما يفتح الصفحة
+    Route::get('/doctor/dashboard', [DoctorController::class, 'dashboard'])->name('doctor.dashboard');
     // عرض صفحة إضافة الموعد
     Route::get('/doctor/add-schedule', [ScheduleController::class, 'create'])->name('doctor.schedule.create');
     Route::post('/doctor/store-schedule', [ScheduleController::class, 'addSchedule'])->name('doctor.schedule.add');
@@ -71,3 +70,5 @@ Route::post('/doctor/records/create', [RecordController::class, 'createRecord'])
 // مسار تحديث الملاحظات السريرية
 Route::put('/doctor/records/{recordId}/update-notes', [RecordController::class, 'updateNotes'])->name('record.updateNotes');
 
+// مسار عرض صفحة السجل الطبي لمريض معين باستخدام الـ patientId
+Route::get('/doctor/records/{patientId}', [RecordController::class, 'showRecordPage'])->name('record.show');

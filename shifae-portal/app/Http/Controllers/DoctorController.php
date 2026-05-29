@@ -10,7 +10,9 @@ use Illuminate\Http\Request;
 use App\Models\User; // لأن الدكاترة مخزنين في جدول المستخدمين
 use App\Models\Schedule;
 use Exception;
-
+use App\Models\Booking;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 class DoctorController extends Controller
 {
     /**
@@ -36,4 +38,21 @@ class DoctorController extends Controller
             ]);
         }
     }
+  
+
+
+public function dashboard()
+{
+    // جلب معرف الطبيب المسجل الدخول
+    $doctorId = Auth::id(); 
+    
+    // جلب مواعيد اليوم وترتيبها حسب الوقت تصاعدياً
+    $todaysAppointments = Booking::with('patient') // لجلب بيانات المريض المرتبطة بالحجز
+        ->where('doctorId', $doctorId)
+        ->whereDate('appointmentDate', Carbon::today()) // تصفية المواعيد لتاريخ اليوم فقط
+        ->orderBy('appointmentDate', 'asc')
+        ->get();
+
+    return view('doctor.dashboard', compact('todaysAppointments'));
+}
 }
