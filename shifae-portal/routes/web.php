@@ -16,7 +16,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\BookingController;
-
+use App\Http\Controllers\RecordController;
 
 Route::get('/', function () {
     // نجلب كل الدكاترة مباشرة مع جداول مواعيدهم بدون شرط الـ role 
@@ -63,4 +63,11 @@ Route::get('/bookings/form', [BookingController::class, 'create'])->name('bookin
 
 Route::post('/bookings/store', [BookingController::class, 'store'])->name('bookings.store');
 
+
+
+// مسار إنشاء السجل الطبي
+Route::post('/doctor/records/create', [RecordController::class, 'createRecord'])->name('record.create');
+
+// مسار تحديث الملاحظات السريرية
+Route::put('/doctor/records/{recordId}/update-notes', [RecordController::class, 'updateNotes'])->name('record.updateNotes');
 
