@@ -12,21 +12,22 @@ class BookingObserver
      */
     public function updated(Booking $targetBooking)
     {
+        
         try {
             // التحقق مما إذا كانت حالة الحجز هي التي تغيرت
-            // ملاحظة: لو كان اسم عمود الحالة مختلف عندك، استبدلي 'status' بالاسم الصحيح
-            if ($targetBooking->isDirty('status')) { 
+
+            if ($targetBooking->wasChanged('status')) { 
                 
                 // جلب الحجرة مباشرة عبر العلاقة التي أنشأتيها في مودل Booking
                 $associatedRoom = $targetBooking->room; 
                 
                 if ($associatedRoom) {
                     // تغيير حالة الحجرة بناءً على حالة الحجز الجديدة
-                    if ($targetBooking->status === 'Pending' || $targetBooking->status === 'Confirmed') {
-                        $associatedRoom->roomStatus = 'Occupied';
+                    if ($targetBooking->status === 'pending' || $targetBooking->status === 'confirmed') {
+                        $associatedRoom->roomStatus = 'occupied';
                         // فقط في حالة الإلغاء تعود الغرفة متاحة
-                    } elseif ($targetBooking->status === 'Cancelled') {
-                        $associatedRoom->roomStatus = 'Available';
+                    } elseif ($targetBooking->status === 'cancelled') {
+                        $associatedRoom->roomStatus = 'available';
                     }
                     
                     // حفظ حالة الحجرة الجديدة
