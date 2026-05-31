@@ -154,7 +154,7 @@ public function store(Request $request)
 }
 
 
-//بنبعتهم من اسراء 
+//سيتم وضع هذه الدوال في واجهة الاستقبال
 public function update(Request $request, $id)// دالة تعديل حجز لمريض
     {
         try {

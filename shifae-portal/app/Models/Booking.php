@@ -20,17 +20,33 @@ public function patient() {
 }
 
 public function doctor() {
-    return $this->belongsTo(User::class, 'user_id');
+    return $this->belongsTo(Doctor::class, 'doctorId');
 }
+
+public function room()
+    {
+        try {
+            // المعامل الثاني هو اسم العمود الموجود في جدول الحجوزات (المفتاح الأجنبي)
+            // المعامل الثالث هو اسم العمود في جدول الحجرات إذا لم يكن id
+            return $this->belongsTo(Room::class, 'roomNumber', 'id'); 
+            
+          
+            
+        } catch (\Exception $exceptionError) {
+            \Illuminate\Support\Facades\Log::error('Error in Booking room relation: ' . $exceptionError->getMessage());
+            return null;
+        }
+    }
 
 public static function checkRoomAvailability($dateTime, $room)
 {
     // التحقق من تعارض الحجرات لمنع أي تعارض مكاني بنسبة 100%
-    $collision = self::where('appointmentDate', $day)
+    $collision = self::where('appointmentDate', $dateTime)
                      ->where('roomNumber', $room)
-                     ->where('status', 'confirmed')
+                     ->whereIn('status', ['Confirmed', 'Pending'])
                      ->exists();
 
     return !$collision;
 }
+
 }
