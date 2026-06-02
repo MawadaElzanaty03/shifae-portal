@@ -19,9 +19,9 @@ class PatientController extends Controller
             $currentUserRole = Auth::user()->userRole;
             // 2. تطبيق الـ Strategy Pattern
             $searchStrategy = null;
-            if ($currentUserRole === 'doctor') {
+            if ($currentUserRole === 'Doctor') {
                 $searchStrategy = new DoctorSearchStrategy();
-            } elseif ($currentUserRole === 'receptionist') {
+            } elseif ($currentUserRole === 'Receptionist') {
                 $searchStrategy = new ReceptionistSearchStrategy();
             } else {
                 return back()->withErrors(['accessError' => 'ليس لديك صلاحية للبحث.']);
@@ -34,7 +34,7 @@ class PatientController extends Controller
                 return back()->withErrors(['searchError' => 'لم يتم العثور على المريض.'])->withInput();
             }
             // إذا كان المستخدم طبيباً، نوجهه لصفحة تفاصيل المريض الخاصة بالطبيب
-            if ($currentUserRole === 'doctor') {
+            if ($currentUserRole === 'Doctor') {
                 return view('doctor.patient_details', [
                     'patientData' => $patientData
                 ]);
