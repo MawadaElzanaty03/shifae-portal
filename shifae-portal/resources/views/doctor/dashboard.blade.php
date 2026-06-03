@@ -45,8 +45,39 @@
             <h1>أهلاً دكتور {{ auth()->user()->fullName }}</h1>
             <p>من خلال هذه اللوحة يمكنك إدارة جدول مواعيدك في عيادة شفاء بطرابلس.</p>
         </div>
+
+         <!-- كارد البحث (مخفي افتراضياً) -->
+        <div class="card search-form" id="searchCard" style="display: none;">
+            <h2>البحث عن مريض </h2>
+            <form action="{{ route('patients.search') }}" method="GET">
+                <input type="text" name="searchQuery" required placeholder="أدخل اسم المريض أو رقم الهاتف هنا..." value="{{ old('searchQuery') }}">
+                <button type="submit">بحث</button>
+            </form>
+            
+            @if($errors->any())
+                <div style="color: red; margin-top: 15px;">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+        </div>
         @endif
     </div>
+      <!-- سكريبت التبديل بين الواجهات -->
+    <script>
+        function showWelcome() {
+            var welcomeCard = document.getElementById('welcomeCard');
+            var searchCard = document.getElementById('searchCard');
+            if(welcomeCard) welcomeCard.style.display = 'block';
+            if(searchCard) searchCard.style.display = 'none';
+        }
+        function showSearch() {
+            var welcomeCard = document.getElementById('welcomeCard');
+            var searchCard = document.getElementById('searchCard');
+            if(welcomeCard) welcomeCard.style.display = 'none';
+            if(searchCard) searchCard.style.display = 'block';
+        }
+    </script>
+
 
 </body>
 </html>
