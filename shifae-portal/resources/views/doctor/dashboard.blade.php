@@ -25,7 +25,8 @@
 
     <div class="sidebar">
         <h3>بوابة الطبيب</h3>
-        <a href="{{ route('doctor.dashboard') }}">الرئيسية</a>
+        <a href="#" onclick="showWelcome(); return false;">الرئيسية</a>
+        <a href="#" onclick="showSearch(); return false;">البحث عن مريض</a>
         <a href="{{ route('doctor.schedule.create') }}">إضافة مواعيد جديدة</a>
         <a href="{{ route('doctor.schedules.index') }}">تعديل وحذف المواعيد</a>
         
@@ -41,7 +42,7 @@
         @yield('content')
 
         @if(Route::is('doctor.dashboard'))
-        <div class="card">
+        <div class="card" id="welcomeCard">
             <h1>أهلاً دكتور {{ auth()->user()->fullName }}</h1>
             <p>من خلال هذه اللوحة يمكنك إدارة جدول مواعيدك في عيادة شفاء بطرابلس.</p>
         </div>
