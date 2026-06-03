@@ -146,9 +146,10 @@ public function store(Request $request)
     
     
     catch (\Exception $e) {
-        // 🛑 هذا السطر هو اللي حيصيد الخطأ لو الداتابيز رفضت الحفظ
+        //  هذا السطر هو اللي حيصيد الخطأ لو الداتابيز رفضت الحفظ
         dd('فشل الحفظ في الداتابيز بسبب الخطأ التالي: ' . $e->getMessage());
     }
+
 
 
 }
@@ -158,21 +159,38 @@ public function store(Request $request)
 public function update(Request $request, $id)// دالة تعديل حجز لمريض
     {
         try {
-            // 1. التحقق من البيانات اللي تبي تسمح بتعديلها فقط
-            $validated = $request->validate([
-                'roomNumber'  => 'sometimes|string',
-                // لو تبي تسمح بتعديل الاسم ورقم الهاتف ضيفهم هنا:
-                // 'name'        => 'sometimes|string|max:255',
-                // 'phoneNumber' => 'sometimes|string',
+            // 1. التحقق من البيانات المرسلة (خاصة بالموعد فقط)
+            $request->validate([
+                'roomNumber'       => 'sometimes|string',
+                'appointment_data' => 'sometimes|string', 
             ]);
 
-            // 2. جلب الحجز مباشرة (من غير أي شروط للصلاحيات)
+            // 2. جلب الحجز
             $booking = Booking::findOrFail($id);
 
-            // 3. تطبيق التعديلات
-            $booking->update($validated);
+            // 3. تحديث بيانات الموعد (الطبيب، التاريخ، الساعة) إذا تم إرسال موعد جديد
+            if ($request->has('appointment_data') && !empty($request->appointment_data)) {
+                $parts = explode('|', $request->appointment_data);
+                if(count($parts) == 3) {
+                    $doctorId = $parts[0];
+                    $slotTime = $parts[1];
+                    $selectedDate = $parts[2]; 
 
-            return redirect()->back()->with('success', 'تم تعديل بيانات الحجز بنجاح.');
+                    $fullAppointmentDate = $selectedDate . ' ' . $slotTime;
+
+                    $booking->doctorId = $doctorId;
+                    $booking->appointmentDate = $fullAppointmentDate;
+                }
+            }
+
+            // 4. تحديث الغرفة إذا تم إرسالها
+            if ($request->has('roomNumber')) {
+                $booking->roomNumber = $request->roomNumber;
+            }
+
+            $booking->save();
+
+            return redirect()->back()->with('success', 'تم تعديل بيانات الموعد بنجاح.');
 
         } catch (\Exception $e) {
             \Log::error('حدث خطأ أثناء التعديل: ' . $e->getMessage());
@@ -192,8 +210,8 @@ public function update(Request $request, $id)// دالة تعديل حجز لم�
             'status' => 'cancelled'
         ]);
 
-        // 3. إعادة توجيه المريض إلى صفحة إنشاء الحجوزات مع رسالة نجاح
-        return redirect()->route('bookings.create')->with('success', 'تم إلغاء الموعد بنجاح.');
+        // 3. إعادة التوجيه للصفحة السابقة مع رسالة نجاح
+        return redirect()->back()->with('success', 'تم إلغاء الموعد بنجاح.');
 
     } catch (\Exception $e) {
         // تسجيل الخطأ في ملف النظام إذا حدثت مشكلة غير متوقعة
