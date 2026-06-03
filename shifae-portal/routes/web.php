@@ -77,3 +77,11 @@ Route::post('/doctor/records/create', [RecordController::class, 'createRecord'])
 // مسار تحديث الملاحظات السريرية
 Route::put('/doctor/records/{recordId}/update-notes', [RecordController::class, 'updateNotes'])->name('record.updateNotes');
 
+    // مسار لوحة تحكم الاستقبال
+    Route::get('/receptionist/dashboard', function () {
+        try {
+            return view('receptionist.dashboard');
+        } catch (\Exception $viewError) {
+            return back()->withErrors(['systemError' => 'حدث خطأ في عرض الصفحة.']);
+        }
+    })->name('receptionist.dashboard');
