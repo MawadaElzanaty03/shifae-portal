@@ -25,9 +25,8 @@
 
     <div class="sidebar">
         <h3>بوابة الاستقبال</h3>
-        <!-- زر البحث في القائمة الجانبية يرجع للوحة لتظهر خانة البحث -->
-        <a href="{{ route('receptionist.dashboard') }}">الرئيسية / البحث عن مريض</a>
-        
+        <a href="{{ route('receptionist.dashboard') }}" onclick="showWelcome(); return false;">الصفحة الرئيسية</a>
+        <a href="#" onclick="showSearch(); return false;">البحث عن مريض</a>
         <form action="{{ route('logout') }}" method="POST" style="margin-top: 50px;">
             @csrf
             <button type="submit" style="width:100%; background: #c0392b; color: white; border: none; padding: 15px; cursor: pointer; font-weight: bold; font-family: 'Tajawal', sans-serif;">
@@ -48,11 +47,11 @@
         </div>
 
         <div class="card search-form">
-            <h2>البحث عن مريض</h2>
+           <h2>البحث عن مريض</h2>
             <!-- فورم البحث يرسل البيانات للباك اند الخاص بك -->
             <form action="{{ route('patients.search') }}" method="GET">
-                <!-- استخدام searchQuery كما هو مكتوب عندك في الـ Controller -->
-                <input type="text" name="searchQuery" required placeholder="أدخل اسم المريض هنا...">
+                <!-- تم تعديل النص التوضيحي وإضافة value لعدم فقدان النص -->
+                <input type="text" name="searchQuery" required placeholder="أدخل اسم المريض أو رقم الهاتف هنا..." value="{{ old('searchQuery') }}">
                 <button type="submit">بحث</button>
             </form>
             
@@ -65,6 +64,22 @@
         </div>
         @endif
     </div>
+
+    <!-- سكريبت جافاسكريبت للتبديل بين الواجهات -->
+    <script>
+        function showWelcome() {
+            var welcomeCard = document.getElementById('welcomeCard');
+            var searchCard = document.getElementById('searchCard');
+            if(welcomeCard) welcomeCard.style.display = 'block';
+            if(searchCard) searchCard.style.display = 'none';
+        }
+        function showSearch() {
+            var welcomeCard = document.getElementById('welcomeCard');
+            var searchCard = document.getElementById('searchCard');
+            if(welcomeCard) welcomeCard.style.display = 'none';
+            if(searchCard) searchCard.style.display = 'block';
+        }
+    </script>
 
 </body>
 </html>

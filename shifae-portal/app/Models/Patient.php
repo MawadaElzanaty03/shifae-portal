@@ -16,7 +16,7 @@ class Patient extends Model
     ];
     //علاقة المريض بالحجوزات
     public function bookings() {
-    return $this->hasMany(Booking::class);
+   return $this->hasMany(Booking::class, 'patientId');
 }
 
 // علاقة المريض بالسجلات الطبية
