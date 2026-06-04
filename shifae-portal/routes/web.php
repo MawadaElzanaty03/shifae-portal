@@ -85,3 +85,12 @@ Route::put('/doctor/records/{recordId}/update-notes', [RecordController::class, 
             return back()->withErrors(['systemError' => 'حدث خطأ في عرض الصفحة.']);
         }
     })->name('receptionist.dashboard');
+
+    // مسار لعرض واجهة التعديل 
+Route::get('/bookings/edit/{id}', [App\Http\Controllers\BookingController::class, 'edit'])->name('bookings.edit');
+
+// مسار لإرسال بيانات التعديل
+Route::put('/bookings/update/{id}', [App\Http\Controllers\BookingController::class, 'update'])->name('bookings.update');
+
+// مسار لإلغاء الحجز
+Route::delete('/bookings/delete/{id}', [App\Http\Controllers\BookingController::class, 'destroy'])->name('bookings.destroy');

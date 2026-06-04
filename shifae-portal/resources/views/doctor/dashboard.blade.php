@@ -27,6 +27,7 @@
         <h3>بوابة الطبيب</h3>
         <a href="#" onclick="showWelcome(); return false;">الرئيسية</a>
         <a href="#" onclick="showSearch(); return false;">البحث عن مريض</a>
+       
         <a href="{{ route('doctor.schedule.create') }}">إضافة مواعيد جديدة</a>
         <a href="{{ route('doctor.schedules.index') }}">تعديل وحذف المواعيد</a>
         
