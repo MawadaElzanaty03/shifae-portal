@@ -7,5 +7,8 @@ interface BookingStateInterface
 {
     // دالة الدفع وتأكيد الحضور
     public function confirmAttendanceAndPay(Booking $booking, $amount, $paymentMethod);
-    
+   
+     //دالة الالغاء
+    public function cancelBooking(Booking $booking); 
+
 }
