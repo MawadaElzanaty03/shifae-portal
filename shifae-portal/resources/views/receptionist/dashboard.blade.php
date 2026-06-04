@@ -25,8 +25,10 @@
 
     <div class="sidebar">
         <h3>بوابة الاستقبال</h3>
-        <a href="{{ route('receptionist.dashboard') }}" onclick="showWelcome(); return false;">الصفحة الرئيسية</a>
-        <a href="#" onclick="showSearch(); return false;">البحث عن مريض</a>
+        <a href="{{ route('receptionist.dashboard') }}">الصفحة الرئيسية</a>
+<a href="{{ route('receptionist.dashboard') }}" onclick="if(document.getElementById('searchCard')) { showSearch(); return false; }">البحث عن مريض</a>
+
+        <a href="{{ route('bookings.form') }}">إضافة حجز جديد</a>
         <form action="{{ route('logout') }}" method="POST" style="margin-top: 50px;">
             @csrf
             <button type="submit" style="width:100%; background: #c0392b; color: white; border: none; padding: 15px; cursor: pointer; font-weight: bold; font-family: 'Tajawal', sans-serif;">
@@ -41,12 +43,12 @@
 
         <!-- هذا الجزء يظهر فقط في الواجهة الرئيسية قبل البحث -->
         @if(Route::is('receptionist.dashboard'))
-        <div class="card">
+        <div class="card" id="welcomeCard">
             <h1>أهلاً بك في بوابة الاستقبال</h1>
             <p>من خلال هذه اللوحة يمكنك البحث عن المرضى وإدارة الحجوزات.</p>
         </div>
 
-        <div class="card search-form">
+        <div class="card search-form"   id="searchCard" style="display: none;">
            <h2>البحث عن مريض</h2>
             <!-- فورم البحث يرسل البيانات للباك اند الخاص بك -->
             <form action="{{ route('patients.search') }}" method="GET">

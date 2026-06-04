@@ -2,6 +2,12 @@
 
 @section('content')
 <div class="card">
+    @if(session('success'))
+    <div style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
+        {{ session('success') }}
+    </div>
+@endif
+
     <h2>نتيجة البحث (بصلاحيات الطبيب)</h2>
     <p>هذه البيانات معروضة بناءً على دالة DoctorSearchStrategy.</p>
     <hr>
@@ -45,7 +51,7 @@
         @endif
     </div>
 
-    <!-- كود بسيط لإظهار وإخفاء السجلات عند الضغط على الزر -->
+    <!--  لإظهار وإخفاء السجلات عند الضغط على الزر -->
     <script>
         function toggleRecords() {
             var recordsDiv = document.getElementById('medicalRecords');
@@ -57,7 +63,7 @@
         }
     </script>
     <div style="margin-top: 20px;">
-        <!-- زر العودة يرجعنا للداشبورد ويمكننا إضافة كود JS بسيط ليفتح واجهة البحث فوراً إذا أردنا -->
+  
         <a href="{{ route('doctor.dashboard') }}" style="color: #007bb5; text-decoration: none;">&rarr; عودة للوحة الرئيسية</a>
     </div>
 </div>
