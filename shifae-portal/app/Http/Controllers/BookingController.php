@@ -8,6 +8,11 @@ use App\Models\Booking;
 use App\Models\DoctorSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
+use App\States\PendingState;
+use App\States\CompletedState;
+use Exception;
+
 class BookingController extends Controller
 {
  public function create(Request $request)
@@ -278,20 +283,34 @@ public function update(Request $request, $id)// دالة تعديل حجز لم�
         // جلب الحجز
         $booking = Booking::findOrFail($id);
 
-        // تحويل الحالة إلى ملغي
+        // تحديد حالة الحجز
       
-        $booking->update([
-            'status' => 'cancelled'
-        ]);
+       $currentState = null;
+        if ($booking->status === 'pending') {
+            $currentState = new PendingState();
+        } elseif ($booking->status === 'completed/paid') {
+            $currentState = new CompletedState();
+        }
+
+        //design pattren to cancelled booking
+
+           if ($currentState) {
+           
+            $currentState->cancelBooking($booking);
+        } else {
+           
+             return redirect()->back()->with('error', 'لا يمكن إجراء هذه العملية على حالة الموعد الحالية.');
+        }
+
 
         // العودة مع إشعار بالنجاح
         return redirect()->back()->with('success', 'تم إلغاء الموعد بنجاح.');
 
-    } catch (\Exception $e) {
-        // تسجيل الخطأ في ملف النظام إذا حدثت مشكلة غير متوقعة
+    }catch (Exception $e) {
         \Log::error('حدث خطأ أثناء إلغاء الحجز رقم ' . $id . ': ' . $e->getMessage());
         
-        return redirect()->back()->with('error', 'عذراً، حدث خطأ أثناء محاولة إلغاء الموعد.');
+        
+        return redirect()->back()->with('error', $e->getMessage()); 
     }
 }
  // دالة لعرض واجهة البحث

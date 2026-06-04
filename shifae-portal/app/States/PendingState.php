@@ -17,4 +17,16 @@ class PendingState implements BookingStateInterface
 
         return true;
     }
+    //دالة الالغاء
+     
+    public function cancelBooking(Booking $booking)
+    {
+        // تغيير حالة الموعد المعلق إلى ملغي
+        $booking->update([
+            'status' => 'cancelled'
+        ]);
+        
+        return true;
+    }
+
 }
