@@ -85,3 +85,7 @@ Route::put('/doctor/records/{recordId}/update-notes', [RecordController::class, 
             return back()->withErrors(['systemError' => 'حدث خطأ في عرض الصفحة.']);
         }
     })->name('receptionist.dashboard');
+
+
+Route::post('/receptionist/booking/{id}/pay', [App\Http\Controllers\PatientController::class, 'confirmPayment'])->name('receptionist.booking.pay');
+

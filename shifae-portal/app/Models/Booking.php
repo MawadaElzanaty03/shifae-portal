@@ -13,6 +13,8 @@ class Booking extends Model
         'appointmentDate',
         'roomNumber',
         'status',
+         'amount_paid',
+         'payment_method'
     ];
 
 public function patient() {
