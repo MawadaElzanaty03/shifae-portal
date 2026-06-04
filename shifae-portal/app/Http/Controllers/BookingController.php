@@ -153,22 +153,96 @@ public function store(Request $request)
 
 
 }
+    public function edit($id)
+    {
+        try {
+            // جلب الحجز والمريض
+            $booking = Booking::with('patient', 'doctor.user')->findOrFail($id);
+
+            // التأكد من حالة الحجز
+            if ($booking->status == 'cancelled') {
+                return redirect()->back()->with('error', 'هذا الحجز ملغي ولا يمكن تعديله.');
+            }
+
+            // تجهيز المواعيد المتاحة للأطباء
+            $daysMapping = [
+                'Sunday'    => 'الأحد', 'Monday' => 'الإثنين', 'Tuesday' => 'الثلاثاء',
+                'Wednesday' => 'الأربعاء', 'Thursday' => 'الخميس', 'Friday' => 'الجمعة', 'Saturday' => 'السبت',
+            ];
+
+            $doctors = \App\Models\Doctor::whereHas('schedules', function($query) {
+                $query->where('isAvailable', true);
+            })->with(['user', 'schedules'])->get();
+
+            $availableSlots = [];
+            $startDate = \Carbon\Carbon::today();
+            $endDate = \Carbon\Carbon::today()->addDays(7);
+
+            for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+                $dayNameEn = $date->format('l'); 
+                $currentDayNameAr = $daysMapping[$dayNameEn]; 
+                $formattedDate = $date->format('Y-m-d');
+
+                foreach ($doctors as $doctor) {
+                    $doctorSchedulesForDay = $doctor->schedules->where('day', $currentDayNameAr);
+                    foreach ($doctorSchedulesForDay as $schedule) {
+                        $start = \Carbon\Carbon::parse($schedule->startTime);
+                        $end = \Carbon\Carbon::parse($schedule->endTime);
+
+                        while ($start->copy()->addHour() <= $end) {
+                            $slotTime = $start->format('H:i:s');
+                            $fullDateTime = $formattedDate . ' ' . $slotTime;
+
+                            if (\Carbon\Carbon::parse($fullDateTime)->isPast()) {
+                                $start->addHour();
+                                continue;
+                            }
+
+                            $isBooked = \App\Models\Booking::where('doctorId', $doctor->doctorId)
+                                ->where('appointmentDate', $fullDateTime)
+                                ->where('status', 'confirmed')
+                                ->exists();
+
+                            if (!$isBooked) {
+                                $doctorName = $doctor->user ? $doctor->user->fullName : 'طبيب بدون اسم';
+                                $availableSlots[$doctorName][] = [
+                                    'dateLabel' => $currentDayNameAr . ' (' . $formattedDate . ')',
+                                    'timeLabel' => $start->format('H:i'),
+                                    'fullTime'  => $slotTime,
+                                    'bookingDate' => $formattedDate,
+                                    'doctorId'  => $doctor->doctorId
+                                ];
+                            }
+                            $start->addHour();
+                        }
+                    }
+                }
+            }
+
+            // إرسال البيانات لواجهة التعديل
+            return view('bookings.edit', compact('booking', 'availableSlots'));
+
+        } catch (\Exception $e) {
+            \Log::error('خطأ في صفحة التعديل: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'حدث خطأ أثناء تحميل صفحة التعديل.');
+        }
+    }
 
 
 //سيتم وضع هذه الدوال في واجهة الاستقبال
 public function update(Request $request, $id)// دالة تعديل حجز لمريض
     {
         try {
-            // 1. التحقق من البيانات المرسلة (خاصة بالموعد فقط)
+            // التحقق من المدخلات
             $request->validate([
                 'roomNumber'       => 'sometimes|string',
                 'appointment_data' => 'sometimes|string', 
             ]);
 
-            // 2. جلب الحجز
+            // جلب الحجز المستهدف
             $booking = Booking::findOrFail($id);
 
-            // 3. تحديث بيانات الموعد (الطبيب، التاريخ، الساعة) إذا تم إرسال موعد جديد
+            // تحديث الموعد في حال تم تغييره
             if ($request->has('appointment_data') && !empty($request->appointment_data)) {
                 $parts = explode('|', $request->appointment_data);
                 if(count($parts) == 3) {
@@ -183,7 +257,7 @@ public function update(Request $request, $id)// دالة تعديل حجز لم�
                 }
             }
 
-            // 4. تحديث الغرفة إذا تم إرسالها
+            // تحديث الغرفة
             if ($request->has('roomNumber')) {
                 $booking->roomNumber = $request->roomNumber;
             }
@@ -201,16 +275,16 @@ public function update(Request $request, $id)// دالة تعديل حجز لم�
     public function destroy($id)
 {
     try {
-        // 1. جلب الحجز باستخدام الـ ID أو إرجاع خطأ 404 إذا لم يُعثر عليه
+        // جلب الحجز
         $booking = Booking::findOrFail($id);
 
-        // 2. تحديث حالة الحجز إلى "ملغي" بدلاً من الحذف الفعلي
+        // تحويل الحالة إلى ملغي
       
         $booking->update([
             'status' => 'cancelled'
         ]);
 
-        // 3. إعادة التوجيه للصفحة السابقة مع رسالة نجاح
+        // العودة مع إشعار بالنجاح
         return redirect()->back()->with('success', 'تم إلغاء الموعد بنجاح.');
 
     } catch (\Exception $e) {
