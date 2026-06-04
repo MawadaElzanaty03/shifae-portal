@@ -1,7 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Booking;
+use App\States\PendingState;
+use App\States\CompletedState;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Strategies\DoctorSearchStrategy;
@@ -53,6 +56,33 @@ class PatientController extends Controller
 
         
     }
+
+    public function confirmPayment(Request $request, $id)
+{
+    $booking = Booking::findOrFail($id);
+    
+    $validated = $request->validate([
+        'amount_paid' => 'required|numeric|min:0',
+        'payment_method' => 'required|string'
+    ]);
+    $currentState = null;
+    
+    if ($booking->status === 'pending') {
+        $currentState = new PendingState();
+    } elseif ($booking->status === 'completed/paid') {
+        $currentState = new CompletedState();
+    }
+    try {
+        if ($currentState) {
+            $currentState->confirmAttendanceAndPay($booking, $validated['amount_paid'], $validated['payment_method']);
+            return back()->with('success', 'تم تأكيد الحضور واستلام المبلغ بنجاح.');
+        } else {
+            return back()->withErrors(['error' => 'حالة الموعد غير معروفة.']);
+        }
+    } catch (Exception $e) {
+        return back()->withErrors(['error' => $e->getMessage()]);
+    }
+}
     
 }
 

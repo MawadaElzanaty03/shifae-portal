@@ -86,6 +86,10 @@ Route::put('/doctor/records/{recordId}/update-notes', [RecordController::class, 
         }
     })->name('receptionist.dashboard');
 
+
+
+Route::post('/receptionist/booking/{id}/pay', [App\Http\Controllers\PatientController::class, 'confirmPayment'])->name('receptionist.booking.pay');
+
     // مسار لعرض واجهة التعديل 
 Route::get('/bookings/edit/{id}', [App\Http\Controllers\BookingController::class, 'edit'])->name('bookings.edit');
 
@@ -94,3 +98,4 @@ Route::put('/bookings/update/{id}', [App\Http\Controllers\BookingController::cla
 
 // مسار لإلغاء الحجز
 Route::delete('/bookings/delete/{id}', [App\Http\Controllers\BookingController::class, 'destroy'])->name('bookings.destroy');
+
