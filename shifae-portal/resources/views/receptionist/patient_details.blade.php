@@ -56,6 +56,8 @@
                 @endforeach
             </tbody>
         </table>
+        @endif   
+        
         <hr>
 <h3>المواعيد المعلقة (Pending Bookings):</h3>
 

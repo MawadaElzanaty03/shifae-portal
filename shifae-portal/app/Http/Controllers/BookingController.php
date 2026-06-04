@@ -134,12 +134,15 @@ public function store(Request $request)
             'gender' => $request->gender,
         ]);
 
+             $availableRoom = \App\Models\Room::where('roomStatus', 'Available')->first();//اي حجرة متاحة
+
+              $assignedRoom = $availableRoom ? $availableRoom->id : 'غير محددة';
         // 4. إنشاء الحجز
         $booking = \App\Models\Booking::create([
             'patientId' => $patient->id, // أو patientId لو كان هكي اسمه في مودل المريض
             'doctorId' => $doctorId,
             'appointmentDate' => $fullAppointmentDate,
-            'roomNumber' => $request->roomNumber ?? '101',
+            'roomNumber' => $request->roomNumber ?? $assignedRoom, 
             'status' => 'pending',
         ]);
          $bookingNumber = $booking->id;
