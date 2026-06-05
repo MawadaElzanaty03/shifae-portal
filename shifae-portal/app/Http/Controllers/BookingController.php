@@ -349,4 +349,29 @@ public function update(Request $request, $id)// دالة تعديل حجز لم�
             return redirect()->back()->with('error', 'حدث خطأ غير متوقع أثناء البحث.');
         }
     }
+
+    // دالة الاقتراح التلقائي
+    public function recommendDoctor(\Illuminate\Http\Request $request)
+    {
+        $age = $request->input('age');
+        $gender = $request->input('gender');
+        
+        $recommendationLogic = \App\Factories\RecommendationFactory::createRecommendation($age);
+        
+        // طلب الطبيب المناسب
+        $recommendedDoctor = $recommendationLogic->recommend($age, $gender);
+
+        if ($recommendedDoctor && $recommendedDoctor->user) {
+         
+            return response()->json([
+                'success' => true,
+                'doctor_id' => $recommendedDoctor->doctorId,
+                'doctor_name' => $recommendedDoctor->user->fullName,
+                'specialty' => $recommendedDoctor->specialty,
+                'message' => 'بناءً على بياناتك، نقترح لك هذا الأخصائي. يمكنك اعتماده أو اختيار طبيب آخر يدوياً.'
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'لم نتمكن من إيجاد طبيب متطابق تلقائياً، يرجى الاختيار من القائمة.']);
+    }
 }
