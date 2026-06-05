@@ -14,7 +14,13 @@ class Patient extends Model
         'gender'
 
     ];
+    //علاقة المريض بالحجوزات
     public function bookings() {
-    return $this->hasMany(Booking::class);
+   return $this->hasMany(Booking::class, 'patientId');
 }
+
+// علاقة المريض بالسجلات الطبية
+    public function records() {
+        return $this->hasMany(Record::class, 'patientId');
+    }
 }

@@ -17,6 +17,8 @@ use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\RecordController;
+use App\Http\Controllers\PatientController;
+
 
 Route::get('/', function () {
     // نجلب كل الدكاترة مباشرة مع جداول مواعيدهم بدون شرط الـ role 
@@ -49,6 +51,10 @@ Route::middleware(['auth'])->group(function () {
     // عرض صفحة إضافة الموعد
     Route::get('/doctor/add-schedule', [ScheduleController::class, 'create'])->name('doctor.schedule.create');
     Route::post('/doctor/store-schedule', [ScheduleController::class, 'addSchedule'])->name('doctor.schedule.add');
+    
+        // مسار البحث عن مريض (بواسطة الطبيب أو الاستقبال)
+    Route::get('/patients/search', [PatientController::class, 'searchPatient'])->name('patients.search');
+
 
     //عرض المواعيد لغرض الحذف او التعديل
     Route::get('/doctor/manage-schedules', [ScheduleController::class, 'showSchedule'])->name('doctor.schedules.index');
@@ -71,3 +77,26 @@ Route::post('/doctor/records/create', [RecordController::class, 'createRecord'])
 // مسار تحديث الملاحظات السريرية
 Route::put('/doctor/records/{recordId}/update-notes', [RecordController::class, 'updateNotes'])->name('record.updateNotes');
 
+    // مسار لوحة تحكم الاستقبال
+    Route::get('/receptionist/dashboard', function () {
+        try {
+            return view('receptionist.dashboard');
+        } catch (\Exception $viewError) {
+            return back()->withErrors(['systemError' => 'حدث خطأ في عرض الصفحة.']);
+        }
+    })->name('receptionist.dashboard');
+
+
+
+Route::post('/receptionist/booking/{id}/pay', [App\Http\Controllers\PatientController::class, 'confirmPayment'])->name('receptionist.booking.pay');
+
+    // مسار لعرض واجهة التعديل 
+Route::get('/bookings/edit/{id}', [App\Http\Controllers\BookingController::class, 'edit'])->name('bookings.edit');
+
+// مسار لإرسال بيانات التعديل
+Route::put('/bookings/update/{id}', [App\Http\Controllers\BookingController::class, 'update'])->name('bookings.update');
+
+// مسار لإلغاء الحجز
+Route::delete('/bookings/delete/{id}', [App\Http\Controllers\BookingController::class, 'destroy'])->name('bookings.destroy');
+
+Route::get('/api/recommend-doctor', [\App\Http\Controllers\BookingController::class, 'recommendDoctor'])->name('api.recommend.doctor');
