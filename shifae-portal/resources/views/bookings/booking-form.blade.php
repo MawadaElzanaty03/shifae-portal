@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حجز موعد</title>
 <style>
     /* تنسيقات الجو الفايح لبوابة شفائي */
 body {
@@ -93,6 +99,8 @@ option {
     background: #fff;
 }
     </style>
+</head>
+<body>
     {{-- كود إظهار رسالة النجاح الخضراء --}}
 @if(session('success'))
     <div style="background-color: #27ae60; color: white; padding: 15px; border-radius: 10px; margin: 15px auto; max-width: 550px; text-align: center; font-weight: bold; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.2);">
@@ -260,7 +268,11 @@ option {
         });
     </script>
       
-    <input type="hidden" name="roomNumber" value="101">
 
-    <button type="submit" class="btn btn-primary">تأكيد الحجز اللحظي</button>
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button type="submit" class="btn btn-primary" style="margin-top: 0; flex: 1;">تأكيد الحجز اللحظي</button>
+        <a href="{{ route('home') }}" class="btn btn-secondary" style="flex: 1; text-align: center; background-color: #95a5a6; color: white; padding: 14px; border-radius: 10px; font-size: 1.1rem; font-weight: bold; text-decoration: none; transition: background-color 0.3s, transform 0.2s; box-sizing: border-box;">العودة للصفحة الرئيسية</a>
+    </div>
 </form>
+</body>
+</html>

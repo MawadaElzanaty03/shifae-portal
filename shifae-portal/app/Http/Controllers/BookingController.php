@@ -122,12 +122,19 @@ public function store(Request $request)
             'gender' => $request->gender,
         ]);
 
+        // جلب أول حجرة متاحة من قاعدة البيانات
+        $availableRoom = \App\Models\Room::where('roomStatus', 'Available')->first();
+        
+        if (!$availableRoom) {
+            throw new \Exception('لا توجد أي حجرات متاحة حالياً.');
+        }
+
         // 4. إنشاء الحجز
         $booking = \App\Models\Booking::create([
             'patientId' => $patient->id, // أو patientId لو كان هكي اسمه في مودل المريض
             'doctorId' => $doctorId,
             'appointmentDate' => $fullAppointmentDate,
-            'roomNumber' => $request->roomNumber ?? '101',
+            'roomNumber' => $availableRoom->roomNumber,
             'status' => 'pending',
         ]);
          $bookingNumber = $booking->id;
@@ -293,7 +300,6 @@ public function update(Request $request, $id)// دالة تعديل حجز لم�
 
         // العودة مع إشعار بالنجاح
         return redirect()->back()->with('success', 'تم إلغاء الموعد بنجاح.');
-
     }catch (Exception $e) {
         \Log::error('حدث خطأ أثناء إلغاء الحجز رقم ' . $id . ': ' . $e->getMessage());
         

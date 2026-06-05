@@ -56,6 +56,9 @@
                 @endforeach
             </tbody>
         </table>
+    @else
+        <p style="color: #7f8c8d;">لا توجد مواعيد سابقة مسجلة.</p>
+    @endif
         <hr>
 <h3>المواعيد المعلقة (Pending Bookings):</h3>
 
