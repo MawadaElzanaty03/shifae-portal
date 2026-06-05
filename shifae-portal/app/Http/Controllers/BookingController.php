@@ -17,11 +17,10 @@ class BookingController extends Controller
 {
  public function create(Request $request)
 {
-    // 1. تحديد التاريخ المختار (تاريخ اليوم كافتراضي)
-    // $selectedDate = $request->get('date', date('Y-m-d'));
+    
     
   try{
-    // 2. مصفوفة لترجمة الأيام من الإنجليزية للعربية لتطابق قاعدة بياناتك
+    //  مصفوفة لترجمة الأيام من الإنجليزية للعربية لتطابق قاعدة بياناتك
     $daysMapping = [
         'Sunday'    => 'الأحد',
         'Monday'    => 'الإثنين',
@@ -32,80 +31,69 @@ class BookingController extends Controller
         'Saturday'  => 'السبت',
     ];
 
-    // $dayNameEn = date('l', strtotime($selectedDate)); // يعطي مثلاً "Sunday"
-    // $dayNameAr = $daysMapping[$dayNameEn]; // يحوله إلى "الأحد"
-
-    // 3. جلب الأطباء وجداولهم بناءً على اسم اليوم بالعربي
-    $doctors = Doctor::whereHas( 'schedules' , function($query) {
-        $query->where('isAvailable', true);
-    })->with(['user', 'schedules'])->get();
+    
+// جلب الأطباء المتاحين فقط
+            $doctors = \App\Models\Doctor::whereHas('schedules', function($query) {
+                $query->where('isAvailable', true);
+            })->with(['user', 'schedules'])->get();
+            $doctorsData = [];
 
     $availableSlots = [];
     $startDate = \Carbon\Carbon::today();
     $endDate = \Carbon\Carbon::today()->addDays(7);
 
-   for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
-        
-        // جلب اسم اليوم باللغة العربية مباشرة (مثلاً: "الأحد"، "الأربعاء")
-        $dayNameEn = $date->format('l'); 
-        $currentDayNameAr = $daysMapping[$dayNameEn]; 
-        $formattedDate = $date->format('Y-m-d');
 
-        foreach ($doctors as $doctor) {
-            // مطابقة اسم اليوم العربي مع الحقل المخزن في الداتابيز
-            $doctorSchedulesForDay = $doctor->schedules->where('day', $currentDayNameAr);
-
-            foreach ($doctorSchedulesForDay as $schedule) {
-                $start = \Carbon\Carbon::parse($schedule->startTime);
-                $end = \Carbon\Carbon::parse($schedule->endTime);
-
-                // تقسيم الوقت لساعات تلقائياً
-                while ($start->copy()->addHour() <= $end) {
-                    $slotTime = $start->format('H:i:s');
-                   $fullDateTime = $formattedDate . ' ' . $slotTime;
-
-                    // التحقق من أن الموعد في المستقبل وليس في ساعة قد مضت اليوم
-                    if (\Carbon\Carbon::parse($fullDateTime)->isPast()) {
-                        $start->addHour();
-                        continue;
+   foreach ($doctors as $doctor) {
+                $doctorName = $doctor->user ? $doctor->user->fullName : 'طبيب بدون اسم';
+                $doctorId = $doctor->doctorId;
+                $doctorDays = [];
+                for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+                    $dayNameEn = $date->format('l'); 
+                    $currentDayNameAr = $daysMapping[$dayNameEn]; 
+                    $formattedDate = $date->format('Y-m-d');
+                    $doctorSchedulesForDay = $doctor->schedules->where('day', $currentDayNameAr);
+                    $availableSlotsForDay = [];
+                    foreach ($doctorSchedulesForDay as $schedule) {
+                        $start = \Carbon\Carbon::parse($schedule->startTime);
+                        $end = \Carbon\Carbon::parse($schedule->endTime);
+                        while ($start->copy()->addHour() <= $end) {
+                            $slotTime = $start->format('H:i:s');
+                            $fullDateTime = $formattedDate . ' ' . $slotTime;
+                            if (\Carbon\Carbon::parse($fullDateTime)->isPast()) {
+                                $start->addHour();
+                                continue;
+                            }
+                            // التأكد أن الموعد غير محجوز
+                            $isBooked = \App\Models\Booking::where('doctorId', $doctorId)
+                                ->where('appointmentDate', $fullDateTime)
+                                ->whereIn('status', ['confirmed', 'pending'])
+                                ->exists();
+                            if (!$isBooked) {
+                                $availableSlotsForDay[] = $slotTime;
+                            }
+                            $start->addHour();
+                        }
                     }
-
-                    // التحقق من وجود حجز مسبق في هذه الساعة والتاريخ بالتحديد
-                    $isBooked = Booking::where('doctorId', $doctor->doctorId)
-                        ->where('appointmentDate', $fullDateTime)
-                        ->where('status', 'confirmed')
-                        ->exists();
-
-                    if (!$isBooked) {
-                        $doctorName = $doctor->user ? $doctor->user->fullName : 'طبيب بدون اسم';
-                        
-                        // تجميع المواعيد المتاحة
-                        $availableSlots[$doctorName][] = [
+                    if (count($availableSlotsForDay) > 0) {
+                        $doctorDays[$formattedDate] = [
                             'dateLabel' => $currentDayNameAr . ' (' . $formattedDate . ')',
-                            'timeLabel' => $start->format('H:i'),
-                            'fullTime'  => $slotTime,
-                            'bookingDate' => $formattedDate,
-                            'doctorId'  => $doctor->doctorId
+                            'slots' => $availableSlotsForDay
                         ];
                     }
-                    $start->addHour();
+                }
+                if (count($doctorDays) > 0) {
+                    $doctorsData[$doctorId] = [
+                        'name' => $doctorName,
+                        'days' => $doctorDays
+                    ];
                 }
             }
+            return view('bookings.booking-form', compact('doctorsData'));
+        } catch (\Exception $e) {
+            \Log::error('حدث خطأ: ' . $e->getMessage());
+            return view('bookings.booking-form', ['doctorsData' => []]);
         }
     }
-
-    return view('bookings.booking-form', compact('availableSlots'));
-}
-  catch (\Exception $e) {
-        // تسجيل الخطأ في ملفات النظام (storage/logs/laravel.log) لمعرفة سبب المشكلة
-        Log::error('حدث خطأ أثناء تحميل صفحة إنشاء الحجز: ' . $e->getMessage());
-
-        // في حالة حدوث خطأ، نرسل المستخدم لنفس الصفحة ولكن بمصفوفة مواعيد فارغة ورسالة خطأ
-        session()->flash('error', 'عذراً، حدث خطأ أثناء تحميل المواعيد المتاحة. يرجى المحاولة لاحقاً.');
-        
-        return view('bookings.booking-form', ['availableSlots' => []]);
-}
-}
 public function store(Request $request)
 {
     // 1. التحقق من البيانات
@@ -134,12 +122,19 @@ public function store(Request $request)
             'gender' => $request->gender,
         ]);
 
+        // جلب أول حجرة متاحة من قاعدة البيانات
+        $availableRoom = \App\Models\Room::where('roomStatus', 'Available')->first();
+        
+        if (!$availableRoom) {
+            throw new \Exception('لا توجد أي حجرات متاحة حالياً.');
+        }
+
         // 4. إنشاء الحجز
         $booking = \App\Models\Booking::create([
             'patientId' => $patient->id, // أو patientId لو كان هكي اسمه في مودل المريض
             'doctorId' => $doctorId,
             'appointmentDate' => $fullAppointmentDate,
-            'roomNumber' => $request->roomNumber ?? '101',
+            'roomNumber' => $availableRoom->roomNumber,
             'status' => 'pending',
         ]);
          $bookingNumber = $booking->id;
@@ -305,7 +300,6 @@ public function update(Request $request, $id)// دالة تعديل حجز لم�
 
         // العودة مع إشعار بالنجاح
         return redirect()->back()->with('success', 'تم إلغاء الموعد بنجاح.');
-
     }catch (Exception $e) {
         \Log::error('حدث خطأ أثناء إلغاء الحجز رقم ' . $id . ': ' . $e->getMessage());
         
@@ -347,6 +341,38 @@ public function update(Request $request, $id)// دالة تعديل حجز لم�
         } catch (\Exception $e) {
             \Log::error('حدث خطأ أثناء البحث عن الحجز: ' . $e->getMessage());
             return redirect()->back()->with('error', 'حدث خطأ غير متوقع أثناء البحث.');
+        }
+    }
+
+    // دالة الاقتراح التلقائي
+    public function recommendDoctor(\Illuminate\Http\Request $request)
+    {
+        try {
+            $age = $request->input('age');
+            $gender = $request->input('gender');
+            
+            // استدعاء المصنع لتحديد منطق التوصية المناسب
+            $recommendationLogic = \App\Factories\RecommendationFactory::createRecommendation($age);
+            
+            // طلب الطبيب المناسب وتمرير البيانات إليه
+            $recommendedDoctor = $recommendationLogic->recommend($age, $gender);
+
+            if ($recommendedDoctor && $recommendedDoctor->user) {
+             
+                return response()->json([
+                    'success' => true,
+                    'doctor_id' => $recommendedDoctor->doctorId,
+                    'doctor_name' => $recommendedDoctor->user->fullName,
+                    'specialty' => $recommendedDoctor->specialty,
+                    'message' => 'بناءً على بياناتك، نقترح لك هذا الأخصائي. يمكنك اعتماده أو اختيار طبيب آخر يدوياً.'
+                ]);
+            }
+
+            return response()->json(['success' => false, 'message' => 'لم نتمكن من إيجاد طبيب متطابق تلقائياً، يرجى الاختيار من القائمة.']);
+        } catch (\Exception $e) {
+            // معالجة الخطأ لمنع ظهور رسالة خطأ صريحة للمستخدم
+            \Log::error('حدث خطأ أثناء اقتراح الطبيب: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'حدث خطأ غير متوقع أثناء محاولة اقتراح الطبيب.']);
         }
     }
 }

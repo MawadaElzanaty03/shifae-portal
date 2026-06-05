@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حجز موعد</title>
 <style>
     /* تنسيقات الجو الفايح لبوابة شفائي */
 body {
@@ -93,6 +99,8 @@ option {
     background: #fff;
 }
     </style>
+</head>
+<body>
     {{-- كود إظهار رسالة النجاح الخضراء --}}
 @if(session('success'))
     <div style="background-color: #27ae60; color: white; padding: 15px; border-radius: 10px; margin: 15px auto; max-width: 550px; text-align: center; font-weight: bold; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.2);">
@@ -126,43 +134,145 @@ option {
 
    <div class="form-group">
         <label>تاريخ الميلاد</label>
-        <input type="date" name="dateOfBirth" class="form-control" required>
+       <input type="date" id="patientDob" name="dateOfBirth" class="form-control" required>
     </div>
     <div class="form-group">
         <label>الجنس</label>
-        <select name="gender" class="form-control" required>
+        <select id="patientGender" name="gender" class="form-control" required>
             <option value="">-- اختر الجنس --</option>
             <option value="male">ذكر</option>
             <option value="female">أنثى</option>
         </select>
     </div>
-    <div class="form-group">
-        <label for="appointment_data">اختر الطبيب والموعد المتاح من الفترات القادمة:</label>
-        
-        @if(count($availableSlots) > 0)
-            <select name="appointment_data" id="appointment_data" class="form-control" required>
-                <option value="">-- اختر الطبيب والموعد المناسب --</option>
-                
-                @foreach($availableSlots as $doctorName => $slots)
-                    <optgroup label=" {{ $doctorName }}">
-                        @foreach($slots as $slot)
-                            {{-- استخدام الـ CamelCase هنا ليتوافق مع مصفوفتك --}}
-                            <option value="{{ $slot['doctorId'] }}|{{ $slot['fullTime'] }}|{{ $slot['bookingDate'] }}">
-                                {{ $slot['dateLabel'] }} - الساعة {{ $slot['timeLabel'] }}
-                            </option>
-                        @endforeach
-                    </optgroup>
-                @endforeach
-                
-            </select>
-        @else
-            <div class="alert alert-warning text-center mt-2">
-                عذراً، لا توجد مواعيد متاحة حالياً.
-            </div>
-        @endif
+    <!-- تمرير بيانات الأطباء من الكنترولر للجافاسكربت عشان نتحكم في القوائم -->
+    <script>
+        const doctorsData = @json($doctorsData);
+    </script>
+
+    <!-- زر يقترح طبيب بناءً على العمر والجنس باستخدام الـ API -->
+    <div class="form-group" style="margin-top: 20px;">
+        <button type="button" onclick="autoSuggestDoctor()" class="btn btn-primary" style="background-color: #8e44ad; font-size: 1rem; margin-bottom: 5px;">
+            اقتراح طبيب مناسب
+        </button>
+        <div id="suggestionMessage" style="color: green; font-weight: bold; margin-bottom: 10px; text-align: center;"></div>
     </div>
 
-    <input type="hidden" name="roomNumber" value="101">
+    <!-- قوائم اختيار الطبيب واليوم والساعة (تتغير عن طريق الجافاسكربت) -->
+    <div class="form-group">
+        <label>اختر الطبيب:</label>
+        <select id="doctorSelect" name="doctorId" class="form-control" required onchange="updateDays()">
+            <option value="">-- يرجى اختيار الطبيب --</option>
+            @if(!empty($doctorsData))
+                @foreach($doctorsData as $id => $doctor)
+                    <option value="{{ $id }}">{{ $doctor['name'] }}</option>
+                @endforeach
+            @endif
+        </select>
+    </div>
 
-    <button type="submit" class="btn btn-primary">تأكيد الحجز اللحظي</button>
+    <div class="form-group">
+        <label>اختر اليوم:</label>
+        <select id="daySelect" name="selectedDate" class="form-control" required onchange="updateTimes()" disabled>
+            <option value="">-- اختر الطبيب أولاً --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>اختر الساعة:</label>
+        <select id="timeSelect" name="slotTime" class="form-control" required disabled>
+            <option value="">-- اختر اليوم أولاً --</option>
+        </select>
+    </div>
+    
+    <!-- حقل مخفي يدمج البيانات للكنترولر -->
+    <input type="hidden" name="appointment_data" id="appointment_data">
+
+    <!-- دوال الجافاسكربت للتحكم في القوائم المنسدلة وربط الـ API -->
+    <script>
+        function updateDays() {
+            const doctorId = document.getElementById('doctorSelect').value;
+            const daySelect = document.getElementById('daySelect');
+            const timeSelect = document.getElementById('timeSelect');
+            
+            daySelect.innerHTML = '<option value="">-- يرجى اختيار اليوم --</option>';
+            timeSelect.innerHTML = '<option value="">-- اختر اليوم أولاً --</option>';
+            daySelect.disabled = true;
+            timeSelect.disabled = true;
+
+            if (doctorId && doctorsData[doctorId]) {
+                const days = doctorsData[doctorId].days;
+                for (const [dateString, dayInfo] of Object.entries(days)) {
+                    daySelect.innerHTML += `<option value="${dateString}">${dayInfo.dateLabel}</option>`;
+                }
+                daySelect.disabled = false;
+            }
+        }
+
+        function updateTimes() {
+            const doctorId = document.getElementById('doctorSelect').value;
+            const selectedDate = document.getElementById('daySelect').value;
+            const timeSelect = document.getElementById('timeSelect');
+            
+            timeSelect.innerHTML = '<option value="">-- يرجى اختيار الساعة --</option>';
+            timeSelect.disabled = true;
+
+            if (doctorId && selectedDate && doctorsData[doctorId].days[selectedDate]) {
+                const slots = doctorsData[doctorId].days[selectedDate].slots;
+                slots.forEach(slot => {
+                    const formattedTime = slot.substring(0, 5); 
+                    timeSelect.innerHTML += `<option value="${slot}">${formattedTime}</option>`;
+                });
+                timeSelect.disabled = false;
+            }
+        }
+        
+        function autoSuggestDoctor() {
+            const dob = document.getElementById('patientDob').value;
+            const gender = document.getElementById('patientGender').value;
+            
+            if(!dob) {
+                alert('الرجاء إدخال تاريخ الميلاد أولاً لكي يستطيع النظام حساب العمر.');
+                return;
+            }
+
+            const currentYear = new Date().getFullYear();
+            const birthYear = new Date(dob).getFullYear();
+            const age = currentYear - birthYear;
+
+            fetch(`/api/recommend-doctor?age=${age}&gender=${gender}`)
+                .then(response => response.json())
+                .then(data => {
+                    const msgBox = document.getElementById('suggestionMessage');
+                    if(data.success) {
+                        msgBox.style.color = 'green';
+                        msgBox.innerText = data.message;
+                        document.getElementById('doctorSelect').value = data.doctor_id;
+                        updateDays();
+                    } else {
+                        msgBox.style.color = 'red';
+                        msgBox.innerText = data.message;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // تجميع البيانات في الحقل المخفي قبل الإرسال عشان الكنترولر يقدر يتعامل معاها
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const doctorId = document.getElementById('doctorSelect').value;
+            const selectedDate = document.getElementById('daySelect').value;
+            const slotTime = document.getElementById('timeSelect').value;
+            
+            if(doctorId && selectedDate && slotTime) {
+                document.getElementById('appointment_data').value = `${doctorId}|${slotTime}|${selectedDate}`;
+            }
+        });
+    </script>
+      
+
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button type="submit" class="btn btn-primary" style="margin-top: 0; flex: 1;">تأكيد الحجز اللحظي</button>
+        <a href="{{ route('home') }}" class="btn btn-secondary" style="flex: 1; text-align: center; background-color: #95a5a6; color: white; padding: 14px; border-radius: 10px; font-size: 1.1rem; font-weight: bold; text-decoration: none; transition: background-color 0.3s, transform 0.2s; box-sizing: border-box;">العودة للصفحة الرئيسية</a>
+    </div>
 </form>
+</body>
+</html>

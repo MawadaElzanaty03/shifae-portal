@@ -99,3 +99,4 @@ Route::put('/bookings/update/{id}', [App\Http\Controllers\BookingController::cla
 // مسار لإلغاء الحجز
 Route::delete('/bookings/delete/{id}', [App\Http\Controllers\BookingController::class, 'destroy'])->name('bookings.destroy');
 
+Route::get('/api/recommend-doctor', [\App\Http\Controllers\BookingController::class, 'recommendDoctor'])->name('api.recommend.doctor');
