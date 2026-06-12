@@ -15,6 +15,7 @@ return new class extends Migration
           $table->id('userId');//primary key
           $table->string('fullName');// camelCase for column names
           $table->string('userName')->unique();//اسم فريد 
+          $table->string('email')->unique(); //البريد الالكتروني
           $table->string('password');
           $table->string('userRole');
           $table->timestamps();//مفيد لمعرفة متى تم انشاء هذا الحساب و متى تم تعديل بياناته
