@@ -100,3 +100,8 @@ Route::put('/bookings/update/{id}', [App\Http\Controllers\BookingController::cla
 Route::delete('/bookings/delete/{id}', [App\Http\Controllers\BookingController::class, 'destroy'])->name('bookings.destroy');
 
 Route::get('/api/recommend-doctor', [\App\Http\Controllers\BookingController::class, 'recommendDoctor'])->name('api.recommend.doctor');
+
+// بدء مسارات إدارة الموارد البشرية لإضافة موظف جديد
+Route::get('/hr/employees/create', [App\Http\Controllers\EmployeeController::class, 'createEmployeeForm'])->name('hr.employees.create');
+Route::post('/hr/employees/store', [App\Http\Controllers\EmployeeController::class, 'addEmployee'])->name('hr.employees.store');
+// نهاية مسارات إدارة الموارد البشرية

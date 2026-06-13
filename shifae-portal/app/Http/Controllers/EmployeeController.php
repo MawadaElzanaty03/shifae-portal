@@ -12,6 +12,20 @@ use Exception;
 
 class EmployeeController extends Controller
 {
+    // عرض صفحة إضافة موظف
+    public function createEmployeeForm()
+    {
+        // محاولة تنفيذ كود إرجاع الواجهة لضمان عدم توقف النظام في حال حدوث خطأ
+        try {
+            // إرجاع واجهة نموذج إضافة الموظف
+            return view('hr.add-employee');
+        } catch (Exception $exception) {
+            // تسجيل الخطأ في السجل وإرجاع رسالة للمستخدم
+            \Log::error('حدث خطأ أثناء فتح صفحة إضافة الموظف: ' . $exception->getMessage());
+            return redirect()->back()->with('error', 'حدث خطأ أثناء فتح الصفحة.');
+        }
+    }
+
     //دالة إضافة موظف جديد
     public function addEmployee(Request $request){
         //التحقق من صحة المدخلات الرئيسية
