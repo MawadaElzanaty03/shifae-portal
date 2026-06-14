@@ -105,3 +105,15 @@ Route::get('/api/recommend-doctor', [\App\Http\Controllers\BookingController::cl
 Route::get('/hr/employees/create', [App\Http\Controllers\EmployeeController::class, 'createEmployeeForm'])->name('hr.employees.create');
 Route::post('/hr/employees/store', [App\Http\Controllers\EmployeeController::class, 'addEmployee'])->name('hr.employees.store');
 // نهاية مسارات إدارة الموارد البشرية
+
+// مسار لوحة تحكم الإدارة
+Route::get('/admin-dashboard', function () {
+    // محاولة إرجاع واجهة الإدارة لتجنب توقف النظام
+    try {
+        return view('admin.dashboard');
+    } catch (\Exception $viewError) {
+        // في حال حدوث خطأ، نرجعه مع رسالة للمستخدم
+        \Log::error('خطأ في واجهة الإدارة: ' . $viewError->getMessage());
+        return back()->withErrors(['systemError' => 'حدث خطأ في عرض الصفحة.']);
+    }
+})->name('admin.dashboard')->middleware('auth');
