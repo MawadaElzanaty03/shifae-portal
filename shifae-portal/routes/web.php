@@ -117,3 +117,6 @@ Route::get('/admin-dashboard', function () {
         return back()->withErrors(['systemError' => 'حدث خطأ في عرض الصفحة.']);
     }
 })->name('admin.dashboard')->middleware('auth');
+
+// مسار التقارير السنوية (خاص بصلاحيات الإدارة)
+Route::get('/admin/reports/annual', [App\Http\Controllers\ReportController::class, 'annualReport'])->name('admin.reports.annual')->middleware('auth');
