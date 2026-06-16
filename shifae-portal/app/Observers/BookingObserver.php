@@ -18,7 +18,7 @@ class BookingObserver
 
             if ($targetBooking->wasChanged('status')) { 
                 
-                // جلب الحجرة مباشرة عبر العلاقة التي أنشأتيها في مودل Booking
+                // جلب الحجرة مباشرة عبر العلاقة التي أنشأتها في مودل Booking
                 $associatedRoom = $targetBooking->room; 
                 
                 if ($associatedRoom) {

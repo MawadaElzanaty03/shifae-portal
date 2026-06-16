@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Models\Doctor;
 use App\Models\Document;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeEmployeeMail;
 use Illuminate\Support\Str;
 use Exception;
 
@@ -66,8 +68,10 @@ class EmployeeController extends Controller
                     'filePath'     => $savedFilePath,
                 ]);
             }
-                // TODO: استدعاء خدمة البريد الإلكتروني لإرسال بيانات الدخول
-            return redirect()->back()->with('success', 'تمت إضافة الموظف بنجاح. كلمة المرور المبدئية: ' . $randomPassword);
+                         // إرسال الإيميل الترحيبي بكلمة المرور
+            Mail::to($newEmployeeUser->email)->send(new WelcomeEmployeeMail($newEmployeeUser, $randomPassword));
+
+            return redirect()->back()->with('success', 'تمت إضافة الموظف وإرسال بيانات الدخول إلى بريده الإلكتروني بنجاح.');
         } catch (Exception $e) {
             \Log::error('خطأ أثناء تسجيل الموظف الجديد: ' . $e->getMessage());
             return redirect()->back()->with('error', 'حدث خطأ غير متوقع أثناء حفظ البيانات.');
