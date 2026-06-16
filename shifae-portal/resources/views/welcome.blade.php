@@ -58,7 +58,7 @@
 
         @forelse($doctorsList as $doctor)
             <div class="doctor-card">
-                <h3 class="doctor-name"> {{ $doctor->user->fullName }} </h3>
+                <h3 class="doctor-name"> {{ $doctor->user?->fullName ?? 'اسم الطبيب غير متوفر' }} </h3>
                 
                 @if($doctor->schedules->where('isAvailable', true)->count() > 0)
                     <table class="schedule-table">
