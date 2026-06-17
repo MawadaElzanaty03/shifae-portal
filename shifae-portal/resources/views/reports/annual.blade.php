@@ -165,6 +165,28 @@
                 @endforelse
             </tbody>
         </table>
+
+        <!-- قسم اختيار السنة للتقارير -->
+        <div style="margin-top: 50px; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border-top: 4px solid #0284c7;">
+            <h3 style="color: #334155; margin-bottom: 10px;">إحصائيات السنوات الأخرى</h3>
+            <p style="color: #64748b; margin-bottom: 25px;">قم بتغيير السنة أدناه ليتم تحديث إحصائيات الصفحة بأكملها فوراً.</p>
+            
+            <form action="{{ route('admin.reports.annual') }}" method="GET" style="display: flex; justify-content: center; gap: 15px; align-items: center; flex-wrap: wrap;">
+                <label for="year" style="font-weight: 500; color: #475569; font-size: 18px;">السنة المعروضة حالياً:</label>
+                
+                <!-- بمجرد تغيير القيمة (onchange) يتم إرسال النموذج وتحديث الصفحة تلقائياً -->
+                <input type="number" name="year" id="year" list="years-list" value="{{ $year }}" min="2026" max="{{ \Carbon\Carbon::now()->year + 1 }}" required
+                       onchange="this.form.submit()"
+                       style="padding: 10px 15px; border: 2px solid #0284c7; border-radius: 6px; outline: none; font-family: 'Tajawal', sans-serif; width: 150px; font-size: 18px; text-align: center; font-weight: bold; color: #0284c7; cursor: pointer;">
+                
+                <!-- تبدأ القائمة من السنة الحالية نزولاً إلى 2026 (سنة إطلاق النظام) -->
+                <datalist id="years-list">
+                    @for($i = \Carbon\Carbon::now()->year + 1; $i >= 2026; $i--)
+                        <option value="{{ $i }}"></option>
+                    @endfor
+                </datalist>
+            </form>
+        </div>
     </div>
 
 </body>
