@@ -25,8 +25,8 @@
 
     <div class="sidebar">
         <h3>بوابة الطبيب</h3>
-        <a href="#" onclick="showWelcome(); return false;">الرئيسية</a>
-        <a href="#" onclick="showSearch(); return false;">البحث عن مريض</a>
+        <a href="{{ route('doctor.dashboard') }}" onclick="if(document.getElementById('welcomeCard')) { showWelcome(); return false; }">الرئيسية</a>
+        <a href="{{ route('doctor.dashboard', ['action' => 'search']) }}" onclick="if(document.getElementById('searchCard')) { showSearch(); return false; }">البحث عن مريض</a>
        
         <a href="{{ route('doctor.schedule.create') }}">إضافة مواعيد جديدة</a>
         <a href="{{ route('doctor.schedules.index') }}">تعديل وحذف المواعيد</a>
@@ -78,6 +78,16 @@
             if(welcomeCard) welcomeCard.style.display = 'none';
             if(searchCard) searchCard.style.display = 'block';
         }
+
+        // إذا كان هناك أمر بالبحث في الرابط، افتح نافذة البحث تلقائياً
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if(urlParams.get('action') === 'search') {
+                if(document.getElementById('searchCard')) {
+                    showSearch();
+                }
+            }
+        });
     </script>
 
 

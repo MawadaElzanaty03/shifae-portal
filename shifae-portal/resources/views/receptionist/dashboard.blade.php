@@ -26,7 +26,7 @@
     <div class="sidebar">
         <h3>بوابة الاستقبال</h3>
         <a href="{{ route('receptionist.dashboard') }}">الصفحة الرئيسية</a>
-<a href="{{ route('receptionist.dashboard') }}" onclick="if(document.getElementById('searchCard')) { showSearch(); return false; }">البحث عن مريض</a>
+<a href="{{ route('receptionist.dashboard', ['action' => 'search']) }}" onclick="if(document.getElementById('searchCard')) { showSearch(); return false; }">البحث عن مريض</a>
 
         <a href="{{ route('bookings.form') }}">إضافة حجز جديد</a>
         <form action="{{ route('logout') }}" method="POST" style="margin-top: 50px;">
@@ -81,6 +81,16 @@
             if(welcomeCard) welcomeCard.style.display = 'none';
             if(searchCard) searchCard.style.display = 'block';
         }
+
+        // إذا كان هناك أمر بالبحث في الرابط، افتح نافذة البحث تلقائياً
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if(urlParams.get('action') === 'search') {
+                if(document.getElementById('searchCard')) {
+                    showSearch();
+                }
+            }
+        });
     </script>
 
 </body>
