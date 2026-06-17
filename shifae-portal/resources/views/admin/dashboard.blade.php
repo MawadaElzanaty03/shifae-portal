@@ -33,7 +33,10 @@
         
         <!-- رابط توجيه المدير لإضافة موظف جديد -->
         <a href="{{ route('hr.employees.create') }}">إضافة موظف جديد</a>
-        
+             
+        <!-- رابط التقارير السنوية -->
+        <a href="{{ route('admin.reports.annual') }}">التقارير السنوية</a>
+
         <!-- زر تسجيل الخروج-->
         <form action="{{ route('logout') }}" method="POST" style="margin-top: 50px;">
             @csrf

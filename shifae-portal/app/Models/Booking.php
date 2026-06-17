@@ -50,5 +50,14 @@ public static function checkRoomAvailability($dateTime, $room)
 
     return !$collision;
 }
+    public static function getBusiestMonths($year)
+    {
+        // دالة مخصصة لجلب أكثر الشهور ازدحاماً
+        return self::selectRaw('MONTH(appointmentDate) as month, count(*) as totalBookings')->whereYear('appointmentDate',$year)//تحديد سنة الحجوزات
+                   ->groupBy('month')
+                   ->orderBy('totalBookings', 'desc')
+                   ->get();
+    }
+
 
 }
