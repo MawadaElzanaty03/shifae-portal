@@ -18,6 +18,7 @@ return new class extends Migration
           $table->string('email')->unique(); //البريد الالكتروني
           $table->string('password');
           $table->string('userRole');
+          $table->string('gender')->nullable(); // حقل الجنس (مهم لاقتراح الطبيب)
           $table->timestamps();//مفيد لمعرفة متى تم انشاء هذا الحساب و متى تم تعديل بياناته
 
         });

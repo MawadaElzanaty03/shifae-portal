@@ -15,7 +15,7 @@ return new class extends Migration
         $table->id('doctorId'); // هذا حيكون الـ doctor_id اللي بنربطوا بيه بعدين
         
         // الربط بجدول المستخدمين (هذي هي الوراثة اللي في الرسمة)
-        $table->foreignId('userId')->constrained('users')->onDelete('cascade');
+        $table->foreignId('userId')->references('userId')->on('users')->onDelete('cascade');
         
         // الخصائص الخاصة بالدكتور من الكلاس دايجرام
         $table->string('specialty'); // التخصص

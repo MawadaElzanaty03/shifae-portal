@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('staff_contacts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('userId')->constrained('users')->onDelete('cascade');//درت علاقة مع جدول المستخدمين و خليته مفتاح اجنبي 
+            $table->foreignId('userId')->references('userId')->on('users')->onDelete('cascade');//ربط المعرف مع جدول المستخدمين و الحذف التتابعي اجنبي 
             $table->string('phoneNumber')->unique();
             $table->timestamps();
         });

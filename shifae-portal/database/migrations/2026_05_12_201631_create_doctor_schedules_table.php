@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('doctor_schedules', function (Blueprint $table) {//جدول الخاص بساعات عمل الدكاترة
             $table->id('scheduleId');
         // ربط الجدول بجدول الأطباء (وليس المستخدمين العامين)
-      $table->foreignId('doctorId')->constrained('users')->onDelete('cascade');
+      $table->foreignId('doctorId')->references('doctorId')->on('doctors')->onDelete('cascade');
 
         // الخصائص حسب الكلاس دايجرام
      $table->enum('day', [

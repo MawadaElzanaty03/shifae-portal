@@ -142,8 +142,7 @@ public function store(Request $request)
     
     
     catch (\Exception $e) {
-        //  هذا السطر هو اللي حيصيد الخطأ لو الداتابيز رفضت الحفظ
-        dd('فشل الحفظ في الداتابيز بسبب الخطأ التالي: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'فشل الحفظ في الداتابيز بسبب الخطأ التالي: ' . $e->getMessage());
     }
 
 
@@ -304,42 +303,7 @@ public function update(Request $request, $id)// دالة تعديل حجز لم�
         return redirect()->back()->with('error', $e->getMessage()); 
     }
 }
- // دالة لعرض واجهة البحث
-    public function search()
-    {
-        return view('bookings.search');
-    }
-
-    // دالة لاستقبال رقم الحجز والبحث عنه
-    public function findBooking(Request $request)
-    {
-        try {
-            // التحقق من أن المريض أدخل رقم الحجز
-            $request->validate([
-                'booking_id' => 'required|numeric'
-            ]);
-
-            // البحث عن الحجز برقم الـ ID
-            $booking = Booking::find($request->booking_id);
-
-            // إذا لم يتم العثور على الحجز
-            if (!$booking) {
-                return redirect()->back()->with('error', 'عذراً، لم نتمكن من العثور على حجز بهذا الرقم. يرجى التأكد من الرقم والمحاولة مرة أخرى.');
-            }
-
-            // إذا كان الحجز ملغياً مسبقاً (اختياري: لتنبيه المريض)
-            if ($booking->status == 'cancelled') {
-                return redirect()->back()->with('error', 'هذا الحجز ملغي مسبقاً.');
-            }
-
-            // إذا تم العثور عليه، نقوم بتحويله لصفحة التعديل (التي برمجناها سابقاً)
-            return redirect()->route('bookings.edit', $booking->id);
-
-        } catch (\Exception $e) {
-            \Log::error('حدث خطأ أثناء البحث عن الحجز: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'حدث خطأ غير متوقع أثناء البحث.');
-        }
-    }
+    // تم حذف دوال البحث القديمة (search و findBooking) لأنها مهجورة ولم تعد تستخدم
 
     // دالة الاقتراح التلقائي
     public function recommendDoctor(\Illuminate\Http\Request $request)
