@@ -19,7 +19,7 @@ return new class extends Migration
         $table->foreignId('patientId')->constrained('patients')->onDelete('cascade');
        // هذا السطر يربط السجل الطبي بالدكتور المعالج .
        // لو تم حذف الدكتور من المنظومة، تنحذف السجلات المرتبطة بيه (ممكن تغييرها لاحقاً لو تبي تحتفظي بالسجلات).
-        $table->foreignId('doctorId')->constrained('doctors')->onDelete('cascade');
+        $table->foreignId('doctorId')->references('doctorId')->on('doctors')->onDelete('cascade');
         
         // خصائص السجل
         $table->string('diagnosis');//خانة لتشخيص المبدئي

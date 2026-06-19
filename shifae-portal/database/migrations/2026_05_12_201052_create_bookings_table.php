@@ -15,7 +15,7 @@ return new class extends Migration
         $table->id();
             // ربط الحجز بمريض معين (علاقة Foreign Key)
         $table->foreignId('patientId')->constrained('patients')->onDelete('cascade');
-         $table->foreignId('doctorId')->constrained('doctors')->onDelete('cascade');// لربط بالطبيب من يكون
+         $table->foreignId('doctorId')->references('doctorId')->on('doctors')->onDelete('cascade');// لربط الدكتور مع الحجزيكون
          // بيانات الحجز الأساسية
         $table->dateTime('appointmentDate'); // تاريخ ووقت الموعد
         $table->string('roomNumber');        // رقم الحجرة
