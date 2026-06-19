@@ -53,13 +53,15 @@ class ScheduleController extends Controller
 //1. عرض مواعيد الدكتور الحالي
 public function showSchedule()
 {
-    $mySchedules = \App\Models\DoctorSchedule::where('doctorId', auth()->id())->get();
+    $doctor = auth()->user()->doctor; // جلب بيانات الطبيب
+    $mySchedules = \App\Models\DoctorSchedule::where('doctorId', $doctor->doctorId)->get();
     return view('doctor.doctor_schedule_index', compact('mySchedules'));
 }
 //دالة لحذ موعد
 public function deleteSchedule($id)
 {
-    $schedule = \App\Models\DoctorSchedule::where('scheduleId', $id)->where('doctorId', auth()->id())->firstOrFail();
+    $doctor = auth()->user()->doctor;
+    $schedule = \App\Models\DoctorSchedule::where('scheduleId', $id)->where('doctorId', $doctor->doctorId)->firstOrFail();
     $schedule->delete();
     
     return back()->with('success', 'تم حذف الموعد بنجاح.');
@@ -83,10 +85,8 @@ public function updateSchedule(Request $request, $id)
     // تنفيذ التحقق مع الرسائل الجديدة
     $request->validate($rules, $messages);
 
-    
-    
-
-    $schedule = \App\Models\DoctorSchedule::where('scheduleId', $id)->where('doctorId', auth()->id())->firstOrFail();
+    $doctor = auth()->user()->doctor;
+    $schedule = \App\Models\DoctorSchedule::where('scheduleId', $id)->where('doctorId', $doctor->doctorId)->firstOrFail();
     $schedule->update([
         'startTime' => $request->startTime,
         'endTime' => $request->endTime,
