@@ -39,6 +39,8 @@ label {
     box-sizing: border-box; /* لضمان عدم خروج الحقول عن الإطار */
 }
 
+
+
 .form-control:focus {
     outline: none;
     border-color: #3498db;
@@ -126,7 +128,7 @@ option {
 
    <div class="form-group">
         <label>تاريخ الميلاد</label>
-       <input type="date" id="patientDob" name="dateOfBirth" class="form-control" required>
+       <input type="text" id="patientDob" name="dateOfBirth" class="form-control" placeholder="السنة / الشهر / اليوم" onfocus="this.type='date'; this.lang='en-US'; this.style.direction='ltr'; this.style.textAlign='right';" onblur="if(!this.value) { this.type='text'; this.lang='ar'; this.style.direction='rtl'; }" required>
     </div>
     <div class="form-group">
         <label>الجنس</label>
