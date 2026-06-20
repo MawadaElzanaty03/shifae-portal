@@ -14,13 +14,30 @@
         body {
             font-family: 'Tajawal', sans-serif;
             background-color: #eef2f5;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        /* الشريط الجانبي */
+        .sidebar { width: 250px; background-color: #2c3e50; color: white; height: 100vh; position: fixed; right: 0; top: 0; padding-top: 20px; }
+        .sidebar h3 { text-align: center; border-bottom: 1px solid #34495e; padding-bottom: 20px; }
+        .sidebar a { display: block; color: white; padding: 15px 20px; text-decoration: none; transition: 0.3s; border-right: 4px solid transparent; }
+        .sidebar a:hover { background-color: #34495e; border-right: 4px solid #007bb5; }
+        
+        /* المحتوى الرئيسي */
+        .main-content {
+            margin-right: 250px; 
+            padding: 40px; 
+            width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
         }
+
+        /* زر تسجيل الخروج */
+        .logoutButton { width: 100%; background: #c0392b; color: white; border: none; padding: 15px; cursor: pointer; font-weight: bold; font-family: 'Tajawal', sans-serif; }
+
 
         /* حاوية النموذج الأساسية */
         .employeeFormContainer {
@@ -125,9 +142,33 @@
 </head>
 <body>
 
-    <!-- حاوية النموذج الأساسية -->
-    <div class="employeeFormContainer">
-        <h2>إضافة موظف جديد</h2>
+    <!-- القائمة الجانبية (Sidebar) -->
+    <div class="sidebar">
+        <h3>بوابة الإدارة</h3>
+        
+        <!-- رابط الصفحة الرئيسية للوحة الإدارة -->
+        <a href="{{ route('admin.dashboard') }}">الصفحة الرئيسية</a>
+        
+        <!-- رابط توجيه المدير لإضافة موظف جديد -->
+        <a href="{{ route('hr.employees.create') }}">إضافة موظف جديد</a>
+             
+        <!-- رابط التقارير السنوية -->
+        <a href="{{ route('admin.reports.annual') }}">التقارير السنوية</a>
+
+        <!-- زر تسجيل الخروج-->
+        <form action="{{ route('logout') }}" method="POST" style="margin-top: 50px;">
+            @csrf
+            <button type="submit" class="logoutButton">
+                تسجيل الخروج
+            </button>
+        </form>
+    </div>
+
+    <!-- منطقة عرض المحتوى الرئيسي -->
+    <div class="main-content">
+        <!-- حاوية النموذج الأساسية -->
+        <div class="employeeFormContainer">
+            <h2>إضافة موظف جديد</h2>
 
         <!-- التحقق من رسائل النجاح أو الخطأ وعرضها -->
         @if(session('success'))
@@ -212,6 +253,7 @@
             </div>
         </form>
     </div>
+</div>
 
     <!-- سكربتات تفاعلية لمعالجة ظهور وإخفاء الحقول -->
     <script>

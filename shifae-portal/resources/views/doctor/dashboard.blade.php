@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>لوحة تحكم الطبيب - شفاء</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Tajawal', sans-serif; margin: 0; display: flex; background-color: #f4f7f6; }
+        body { font-family: 'Tajawal', sans-serif; margin: 0; display: flex; background-color: #eef2f5; }
         
         /* الشريط الجانبي */
         .sidebar { width: 250px; background-color: #2c3e50; color: white; height: 100vh; position: fixed; right: 0; top: 0; padding-top: 20px; }
@@ -25,8 +26,8 @@
 
     <div class="sidebar">
         <h3>بوابة الطبيب</h3>
-        <a href="#" onclick="showWelcome(); return false;">الرئيسية</a>
-        <a href="#" onclick="showSearch(); return false;">البحث عن مريض</a>
+        <a href="{{ route('doctor.dashboard') }}" onclick="if(document.getElementById('welcomeCard')) { showWelcome(); return false; }">الرئيسية</a>
+        <a href="{{ route('doctor.dashboard', ['action' => 'search']) }}" onclick="if(document.getElementById('searchCard')) { showSearch(); return false; }">البحث عن مريض</a>
        
         <a href="{{ route('doctor.schedule.create') }}">إضافة مواعيد جديدة</a>
         <a href="{{ route('doctor.schedules.index') }}">تعديل وحذف المواعيد</a>
@@ -78,6 +79,16 @@
             if(welcomeCard) welcomeCard.style.display = 'none';
             if(searchCard) searchCard.style.display = 'block';
         }
+
+        // إذا كان هناك أمر بالبحث في الرابط، افتح نافذة البحث تلقائياً
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if(urlParams.get('action') === 'search') {
+                if(document.getElementById('searchCard')) {
+                    showSearch();
+                }
+            }
+        });
     </script>
 
 

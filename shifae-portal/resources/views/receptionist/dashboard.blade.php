@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>لوحة تحكم الاستقبال - شفاء</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Tajawal', sans-serif; margin: 0; display: flex; background-color: #f4f7f6; }
+        body { font-family: 'Tajawal', sans-serif; margin: 0; display: flex; background-color: #eef2f5; }
         
         /* نفس ستايل الشريط الجانبي الخاص بالطبيب */
         .sidebar { width: 250px; background-color: #2c3e50; color: white; height: 100vh; position: fixed; right: 0; top: 0; padding-top: 20px; }
@@ -26,7 +27,7 @@
     <div class="sidebar">
         <h3>بوابة الاستقبال</h3>
         <a href="{{ route('receptionist.dashboard') }}">الصفحة الرئيسية</a>
-<a href="{{ route('receptionist.dashboard') }}" onclick="if(document.getElementById('searchCard')) { showSearch(); return false; }">البحث عن مريض</a>
+<a href="{{ route('receptionist.dashboard', ['action' => 'search']) }}" onclick="if(document.getElementById('searchCard')) { showSearch(); return false; }">البحث عن مريض</a>
 
         <a href="{{ route('bookings.form') }}">إضافة حجز جديد</a>
         <form action="{{ route('logout') }}" method="POST" style="margin-top: 50px;">
@@ -81,6 +82,16 @@
             if(welcomeCard) welcomeCard.style.display = 'none';
             if(searchCard) searchCard.style.display = 'block';
         }
+
+        // إذا كان هناك أمر بالبحث في الرابط، افتح نافذة البحث تلقائياً
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if(urlParams.get('action') === 'search') {
+                if(document.getElementById('searchCard')) {
+                    showSearch();
+                }
+            }
+        });
     </script>
 
 </body>

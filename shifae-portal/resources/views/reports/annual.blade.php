@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         /* التنسيقات العامة */
-        body { font-family: 'Tajawal', sans-serif; margin: 0; display: flex; background-color: #f4f7f6; }
+        body { font-family: 'Tajawal', sans-serif; margin: 0; display: flex; background-color: #eef2f5; }
         
         /* الشريط الجانبي */
         .sidebar { width: 250px; background-color: #2c3e50; color: white; height: 100vh; position: fixed; right: 0; top: 0; padding-top: 20px; }
